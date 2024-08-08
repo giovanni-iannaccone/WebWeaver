@@ -1,0 +1,17 @@
+{
+    "_comment": [
+        "   Put inside this file your configurations                                    ",
+        "   - algorithm: rr for Round Robin, wrr for Weighted Rount Robin               ",
+        "              lc for Least Connnections                                        ",
+        "   - servers: write here your servers addresses and ports                      ",
+        "   - healthCheck: true to abilitate healthCheck else false                     "
+    ],
+
+
+    "algorithm": "rr",
+    "servers": [
+        "localhost:3031",
+        "localhost:3032"
+    ],
+    "healthCheck": true
+}
