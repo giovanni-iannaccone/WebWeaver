@@ -1,10 +1,11 @@
 package utils
 
 import (
-	"fmt"
 	"data"
+	"fmt"
 )
 
+// acts exactly like println but print colored text
 func Print(color string, text ...any) {
 	fmt.Print(color)
 	fmt.Print(text...)
