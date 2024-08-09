@@ -4,6 +4,6 @@ package data
 type Config struct {
 	Algorithm  string   `json:"algorithm"`
 	Servers    []string `json:"servers"`
-	HealtCheck bool     `json:"healthCheck"`
+	HealthCheck bool     `json:"healthCheck"`
 	Logs       bool     `json:"logs"`
 }

@@ -10,6 +10,20 @@ import (
 	"utils"
 )
 
+// Call the function to check errors, if any, print them
+func checkAndPrintErrors(config data.Config) bool {
+	errors := checkConfigValidity(config)
+	if  errors != nil {
+		for _, err := range errors {
+			utils.Print(data.Red, err)
+		}
+
+		return true
+	}
+
+	return false
+}
+
 // Checks for configuration validity: a valid algorithm and Server field not empty
 func checkConfigValidity(config data.Config) []string {
 	var errors []string
@@ -25,6 +39,7 @@ func checkConfigValidity(config data.Config) []string {
 	return errors
 }
 
+
 // if the configurations are valid, print them
 func printJsonData(config data.Config) {
 	utils.Print(data.Green, "[+] Using algorithm ", config.Algorithm)
@@ -34,7 +49,7 @@ func printJsonData(config data.Config) {
 		fmt.Printf("\t- %s\n", server)
 	}
 		
-	utils.Print(data.Green, "[+] HealtCheck: ", config.HealtCheck)
+	utils.Print(data.Green, "[+] HealthCheck: ", config.HealthCheck)
 	utils.Print(data.Green, "[+] Logs: ", config.Logs)
 }
 
@@ -54,22 +69,21 @@ func readJson(config *data.Config) {
 
 func main() {
 	var config data.Config
+	data.Init()
 
 	utils.Print(data.Green, "===== Starting SilkRoute =====\n")
-	
 	utils.Print(data.Green, "[+] Reading config files")
 	readJson(&config)
 
-	errors := checkConfigValidity(config)
-	if  errors != nil {
-		for _, err := range errors {
-			utils.Print(data.Red, err)
-		}
-
-		return 
-	}
+	if checkAndPrintErrors(config) { return }
 
 	printJsonData(config)
 
-	
+	data.Algorithms[config.Algorithm](
+		config.Servers, 
+		config.HealthCheck, 
+		config.Logs,
+	)
+
+
 }
