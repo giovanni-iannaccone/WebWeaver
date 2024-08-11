@@ -3,16 +3,16 @@
         "   Put inside this file your configurations                               ",
         "   - algorithm:    rr for Round Robin, wrr for Weighted Rount Robin       ",
         "                   lc for Least Connnections, rnd for random choice       ",
+        "                   iph for ip hash                                        ",
         "   - servers:      write here your servers addresses and ports            ",
         "   - healthCheck:  true to abilitate healthCheck else false               ",
         "   - logs:         save logs"
     ],
 
 
-    "algorithm": "rr",
+    "algorithm": "rnd",
     "servers": [
-        "http://localhost:3031",
-        "http://localhost:3032"
+        "http://localhost:80"
     ],
     "healthCheck": true,
     "logs": true

@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"utils/requests"
 
 	"data"
+	"data/algorithmsData"
+	"data/server"
+	"net/url"
 	"utils"
 )
 
@@ -28,7 +32,7 @@ func checkAndPrintErrors(config data.Config) bool {
 func checkConfigValidity(config data.Config) []string {
 	var errors []string
 
-	if _, exists := data.Algorithms[config.Algorithm]; !exists {
+	if _, exists := algorithmsData.LBAlgorithms[config.Algorithm]; !exists {
 		errors = append(errors, "[+] Unable to find algorithm " + config.Algorithm)
 	}
 
@@ -39,6 +43,17 @@ func checkConfigValidity(config data.Config) []string {
 	return errors
 }
 
+// create an array of servers based on URLs in config files
+func initializeServers(config data.Config) []server.Server{
+	var servers []server.Server
+
+	for _, serverStr := range config.Servers {
+		parsedURL, _ := url.Parse(serverStr)
+		servers = append(servers, server.Server{URL: parsedURL})
+	}
+
+	return servers
+}
 
 // if the configurations are valid, print them
 func printJsonData(config data.Config) {
@@ -69,7 +84,9 @@ func readJson(config *data.Config) {
 
 func main() {
 	var config data.Config
-	data.Init()
+	var servers []server.Server
+
+	algorithmsData.Init()
 
 	utils.Print(data.Green, "===== Starting SilkRoute =====\n")
 	utils.Print(data.Green, "[+] Reading config files")
@@ -79,11 +96,7 @@ func main() {
 
 	printJsonData(config)
 
-	data.Algorithms[config.Algorithm](
-		config.Servers, 
-		config.HealthCheck, 
-		config.Logs,
-	)
-
+	servers = initializeServers(config)
+	requests.HandleRequest(config, servers)
 
 }

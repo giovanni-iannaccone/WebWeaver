@@ -4,5 +4,8 @@ use (
     ./cmd
     ./pkg
     ./pkg/data
+    ./pkg/data/algorithms
+    ./pkg/data/server
     ./pkg/utils
+    ./pkg/utils/requests
 )

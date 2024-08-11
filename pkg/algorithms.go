@@ -1,17 +1,28 @@
 package algorithms
 
-func LeastConnections(servers []string, healthCheck bool, logs bool) {
-	
+// Load Balancing Algorithms implementations
+
+import (
+	"data/server"
+	"math/rand"
+)
+
+func IpHash(servers []server.Server) *server.Server {
+	return &servers[rand.Int()%len(servers)]
 }
 
-func RoundRobin(servers []string, healthCheck bool, logs bool) {
-
+func LeastConnections(servers []server.Server) *server.Server {
+	return &servers[rand.Int()%len(servers)]
 }
 
-func Random(servers []string, healthCheck bool, logs bool) {
-
+func RoundRobin(servers []server.Server) *server.Server {
+	return &servers[rand.Int()%len(servers)]
 }
 
-func WeightedRoundRobin(servers []string, healthCheck bool, logs bool) {
+func Random(servers []server.Server) *server.Server {
+	return &servers[rand.Int() % len(servers)]
+}
 
+func WeightedRoundRobin(servers []server.Server) *server.Server {
+	return &servers[rand.Int()%len(servers)]
 }
