@@ -12,8 +12,8 @@
 
     "algorithm": "rnd",
     "servers": [
-        "http://localhost:80",
-        "http://localhost:8081"
+        "localhost:80",
+        "localhost:8081"
     ],
     "healthCheck": true,
     "logs": true
