@@ -4,47 +4,52 @@ import (
 	"data"
 	"data/algorithmsData"
 	"data/server"
+
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 )
 
+var config data.Config
+var servers []server.Server
+
 type ProxyHandler struct {
 	Proxy *httputil.ReverseProxy
 }
 
-func (t *ProxyHandler) RoundTrip(request *http.Request) (*http.Response, error) {
-	return http.DefaultTransport.RoundTrip(request)
+// New connections handler, get the next server based on algorithm and redirect the request
+func Handler(w http.ResponseWriter, r *http.Request) {
+	nextServer := algorithmsData.LBAlgorithms[config.Algorithm](servers)
+	proxyHandler := NewProxyHandler(nextServer.URL)
+
+	proxyHandler.ProxyRequest(w, r)
 }
 
+// Return a new proxy handler
 func NewProxyHandler(destUrl *url.URL) *ProxyHandler {
-	ph := ProxyHandler{
+	return &ProxyHandler{
 		Proxy: httputil.NewSingleHostReverseProxy(destUrl),
 	}
-	ph.Proxy.Transport = &ph
-	return &ph
 }
 
+// Log and serve http request
 func (h *ProxyHandler) ProxyRequest(w http.ResponseWriter, r *http.Request) {
 	log.Printf("> ProxyRequest, Client: %v, %v %v %v\n", r.RemoteAddr, r.Method, r.URL, r.Proto)
-
 	h.Proxy.ServeHTTP(w, r)
 }
 
-func HandleRequest(config data.Config, servers []server.Server) {
+// "Main" function, define globals, register the handler and listen to incoming requests
+func StartServer(configurations data.Config, serversList []server.Server) {
 	algorithmsData.Init()
 
-	var svrAddr string = "localhost:8080"
-	var svrBaseUrl string = "/"
-	var nextServer *server.Server = algorithmsData.LBAlgorithms[config.Algorithm](servers)
+	config = configurations
+	servers = serversList
 
-	proxyHandler := NewProxyHandler(nextServer.URL)
-	http.HandleFunc(svrBaseUrl, proxyHandler.ProxyRequest)
+	http.HandleFunc("/", Handler)
 
-	err := http.ListenAndServe(svrAddr, nil)
+	err := http.ListenAndServe("localhost:8080", nil)
 	if err != nil {
 		panic(err)
 	}
-
 }

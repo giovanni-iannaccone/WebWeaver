@@ -97,6 +97,6 @@ func main() {
 	printJsonData(config)
 
 	servers = initializeServers(config)
-	requests.HandleRequest(config, servers)
+	requests.StartServer(config, servers)
 
 }
