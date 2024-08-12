@@ -4,6 +4,8 @@ import (
 	"data"
 	"data/algorithmsData"
 	"data/server"
+	"internals"
+	"utils"
 
 	"log"
 	"time"
@@ -14,15 +16,28 @@ import (
 var config data.Config
 var servers []server.Server
 
-// Handle requests, call the function to determine the server and redirect here the request
+// Handle requests, call the function to determine the server, redirect here the request and write logs
 func requestHandler(ctx *fasthttp.RequestCtx) {
-	nextServer := algorithmsData.LBAlgorithms[config.Algorithm](servers)
+	var str string
+	var nextServer *server.Server = algorithmsData.LBAlgorithms[config.Algorithm](servers)
 
-	ctx.Request.SetHost(nextServer.URL.String())
-	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
-	if err != nil {
-		log.Print(err)
+	if internals.IsProhibited(config.Prohibited, ctx.Path()) {
+		ctx.Error("404 not found", fasthttp.StatusNotFound)
+
+	} else {
+		ctx.Request.SetHost(nextServer.URL.String())
+		err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
+		if err != nil {
+			log.Print(err)
+		}
 	}
+
+	if config.Logs != "" {
+		str = " " + ctx.Request.String()
+		log.Print(str)
+		go utils.WriteLogs(str, config.Logs)
+	}
+
 }
 
 // "Main" function, define globals, register the handler and listen to incoming requests

@@ -6,8 +6,8 @@ import (
 )
 
 // acts exactly like println but print colored text
-func Print(color string, text ...any) {
+func Print(color string, format string, args ...any) {
 	fmt.Print(color)
-	fmt.Print(text...)
-	fmt.Println(data.Reset)
+	fmt.Printf(format, args...)
+	fmt.Print(data.Reset)
 }
