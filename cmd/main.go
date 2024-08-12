@@ -1,23 +1,20 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"os"
-	"utils/requests"
+	"net/url"
 
 	"data"
 	"data/algorithmsData"
 	"data/server"
-	"net/url"
+	"internals"
+	"internals/requests"
 	"utils"
 )
 
 // Call the function to check errors, if any, print them
 func checkAndPrintErrors(config data.Config) bool {
-	errors := checkConfigValidity(config)
-	if  errors != nil {
+	errors := internals.CheckConfigValidity(config)
+	if errors != nil {
 		for _, err := range errors {
 			utils.Print(data.Red, err)
 		}
@@ -28,23 +25,8 @@ func checkAndPrintErrors(config data.Config) bool {
 	return false
 }
 
-// Checks for configuration validity: a valid algorithm and Server field not empty
-func checkConfigValidity(config data.Config) []string {
-	var errors []string
-
-	if _, exists := algorithmsData.LBAlgorithms[config.Algorithm]; !exists {
-		errors = append(errors, "[+] Unable to find algorithm " + config.Algorithm)
-	}
-
-	if len(config.Servers) == 0 {
-		errors = append(errors, "[+] No server found ")
-	}
-
-	return errors
-}
-
 // create an array of servers based on URLs in config files
-func initializeServers(config data.Config) []server.Server{
+func initializeServers(config data.Config) []server.Server {
 	var servers []server.Server
 
 	for _, serverStr := range config.Servers {
@@ -57,29 +39,20 @@ func initializeServers(config data.Config) []server.Server{
 
 // if the configurations are valid, print them
 func printJsonData(config data.Config) {
-	utils.Print(data.Green, "[+] Using algorithm ", config.Algorithm)
-	
-	utils.Print(data.Green, "[+] Servers: ")
+	utils.Print(data.Green, "[+] Using algorithm %s\n", config.Algorithm)
+
+	utils.Print(data.Green, "[+] Servers: \n")
 	for _, server := range config.Servers {
-		fmt.Printf("\t- %s\n", server)
-	}
-		
-	utils.Print(data.Green, "[+] HealthCheck: ", config.HealthCheck)
-	utils.Print(data.Green, "[+] Logs: ", config.Logs)
-}
-
-// read a json file
-func readJson(config *data.Config) {
-	jsonFile, err := os.Open("./configs/config.json")
-    
-    if err != nil {
-        fmt.Println(err)
+		utils.Print(data.Gray, "\t- %s\n", server)
 	}
 
-    defer jsonFile.Close()
-    byteValue, _ := io.ReadAll(jsonFile)
+	utils.Print(data.Green, "[+] HealthCheck: %t\n", config.HealthCheck)
+	utils.Print(data.Green, "[+] Logs: %s\n", config.Logs)
 
-	json.Unmarshal([]byte(byteValue), &config)
+	utils.Print(data.Green, "[+] Prohibited: \n")
+	for _, dir := range config.Prohibited {
+		utils.Print(data.Gray, "\t- %s\n", dir)
+	}
 }
 
 func main() {
@@ -88,15 +61,21 @@ func main() {
 
 	algorithmsData.Init()
 
-	utils.Print(data.Green, "===== Starting SilkRoute =====\n")
-	utils.Print(data.Green, "[+] Reading config files")
-	readJson(&config)
+	utils.Print(data.Green, "===== Starting WebWeaver =====\n")
+	utils.Print(data.Green, "[+] Reading config files\n")
 
-	if checkAndPrintErrors(config) { return }
+	err := utils.ReadJson(&config, "./configs/config.json")
+	if err != nil {
+		utils.Print(data.Red, err.Error())
+		return 
+	}
+
+	if checkAndPrintErrors(config) {
+		return
+	}
 
 	printJsonData(config)
 
 	servers = initializeServers(config)
 	requests.StartServer(config, servers)
-
 }

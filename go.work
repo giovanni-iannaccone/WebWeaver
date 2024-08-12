@@ -2,10 +2,11 @@ go 1.21.5
 
 use (
     ./cmd
+    ./internal
+    ./internal/requests
     ./pkg
     ./pkg/data
     ./pkg/data/algorithms
     ./pkg/data/server
     ./pkg/utils
-    ./pkg/utils/requests
 )
