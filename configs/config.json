@@ -2,26 +2,29 @@
     "_comment": [
         "              PUT YOUR CONFIGURATIONS INSIDE OF THIS FILE                 ",
         "                                                                          ",
-        "   - algorithm:    rr for Round Robin, wrr for Weighted Rount Robin       ",
-        "                   lc for Least Connnections, rnd for random choice       ",
+        "   - algorithm:    rr for Round Robin, rnd for random choice              ",
         "                   iph for ip hash                                        ",
+        "   - host          the main server address                                ",
         "   - servers:      write here your servers addresses and ports            ",
-        "   - healthCheck:  true to abilitate healthCheck else false               ",
+        "   - healthCheck:  seconds of the healthCheck timeout, put less           ",
+        "                   than or 0 if you don't want the server to do any       ",
         "   - logs:         file where to save logs, put nothing between           ",
         "                   quotes if you don't want to save logs                  ",
-        "   - prohibited:   file you don't want the server to provide              "
+        "   - prohibited:   file you don't want the server to show                 "
     ],
 
     "algorithm": "rnd",
+    "host": "localhost:8080",
     "servers": [
         "localhost:80",
         "localhost:8081"
     ],
     
-    "healthCheck": true,
+    "healthCheck": 10,
     "logs": "%USERPROFILE%\\Desktop\\logs.txt",
 
     "prohibited": [
-        "/.env"
+        "/.env",
+        "/secret/"
     ]
 }
