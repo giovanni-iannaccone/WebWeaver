@@ -1,14 +1,15 @@
 package server
 
 import (
-	"net/http/httputil"
 	"net/url"
-	"sync"
 )
 
 type Server struct {
-	URL          *url.URL
-	IsAlive      bool
-	Mutex        sync.RWMutex
-	ReverseProxy *httputil.ReverseProxy
+	URL     *url.URL
+	IsAlive bool
+}
+
+type ServersData struct {
+	List  []Server
+	Using int
 }

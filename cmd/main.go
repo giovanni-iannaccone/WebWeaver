@@ -6,14 +6,13 @@ import (
 	"data"
 	"data/algorithmsData"
 	"data/server"
-	"internals"
 	"internals/requests"
 	"utils"
 )
 
 // Call the function to check errors, if any, print them
 func checkAndPrintErrors(config data.Config) bool {
-	errors := internals.CheckConfigValidity(config)
+	errors := config.CheckValidity()
 	if errors != nil {
 		for _, err := range errors {
 			utils.Print(data.Red, err)
@@ -26,27 +25,24 @@ func checkAndPrintErrors(config data.Config) bool {
 }
 
 // create an array of servers based on URLs in config files
-func initializeServers(config data.Config) []server.Server {
-	var servers []server.Server
-
-	for _, serverStr := range config.Servers {
+func initializeServers(urlList []string, servers server.ServersData) {
+	for _, serverStr := range urlList {
 		parsedURL, _ := url.Parse(serverStr)
-		servers = append(servers, server.Server{URL: parsedURL})
+		servers.List = append(servers.List, server.Server{URL: parsedURL})
 	}
-
-	return servers
 }
 
 // if the configurations are valid, print them
 func printJsonData(config data.Config) {
 	utils.Print(data.Green, "[+] Using algorithm %s\n", config.Algorithm)
+	utils.Print(data.Green, "[+] Host: %s\n", config.Host)
 
 	utils.Print(data.Green, "[+] Servers: \n")
 	for _, server := range config.Servers {
 		utils.Print(data.Gray, "\t- %s\n", server)
 	}
 
-	utils.Print(data.Green, "[+] HealthCheck: %t\n", config.HealthCheck)
+	utils.Print(data.Green, "[+] HealthCheck: %d\n", config.HealthCheck)
 	utils.Print(data.Green, "[+] Logs: %s\n", config.Logs)
 
 	utils.Print(data.Green, "[+] Prohibited: \n")
@@ -55,9 +51,10 @@ func printJsonData(config data.Config) {
 	}
 }
 
+// main function, call functions to read json, setup configurations, print errors and start the server
 func main() {
 	var config data.Config
-	var servers []server.Server
+	var servers server.ServersData
 
 	algorithmsData.Init()
 
@@ -67,7 +64,7 @@ func main() {
 	err := utils.ReadJson(&config, "./configs/config.json")
 	if err != nil {
 		utils.Print(data.Red, err.Error())
-		return 
+		return
 	}
 
 	if checkAndPrintErrors(config) {
@@ -76,6 +73,7 @@ func main() {
 
 	printJsonData(config)
 
-	servers = initializeServers(config)
-	requests.StartServer(config, servers)
+	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
+	initializeServers(config.Servers, servers)
+	requests.StartListener(config, servers)
 }

@@ -1,19 +1,17 @@
 package algorithmsData
 
 import (
-	"algorithms"
 	"data/server"
+	algorithms "internals"
 )
 
 // Load Balancing Algorithms
-var LBAlgorithms map[string]func([]server.Server) *server.Server
+var LBAlgorithms map[string]func(server.ServersData)
 
 func Init() {
-	LBAlgorithms = map[string]func([]server.Server) *server.Server{
+	LBAlgorithms = map[string]func(server.ServersData){
 		"iph": algorithms.IpHash,
-		"lc":  algorithms.LeastConnections,
 		"rnd": algorithms.Random,
 		"rr":  algorithms.RoundRobin,
-		"wrr": algorithms.WeightedRoundRobin,
 	}
 }
