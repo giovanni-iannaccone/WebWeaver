@@ -6,6 +6,7 @@ import (
 	"data"
 	"data/algorithmsData"
 	"data/server"
+	"internals/healthCheck"
 	"internals/requests"
 	"utils"
 )
@@ -25,11 +26,14 @@ func checkAndPrintErrors(config data.Config) bool {
 }
 
 // create an array of servers based on URLs in config files
-func initializeServers(urlList []string, servers server.ServersData) {
+func initializeServers(urlList []string, servers *server.ServersData) {
 	for _, serverStr := range urlList {
 		parsedURL, _ := url.Parse(serverStr)
 		servers.List = append(servers.List, server.Server{URL: parsedURL})
 	}
+
+	healthcheck.HealthCheck(servers)
+	healthcheck.PrintHealthCheckStatus(servers)
 }
 
 // if the configurations are valid, print them
@@ -74,6 +78,6 @@ func main() {
 	printJsonData(config)
 
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
-	initializeServers(config.Servers, servers)
+	initializeServers(config.Servers, &servers)
 	requests.StartListener(config, servers)
 }
