@@ -6,10 +6,10 @@ import (
 )
 
 // Load Balancing Algorithms
-var LBAlgorithms map[string]func(server.ServersData)
+var LBAlgorithms map[string]func(server.ServersData, string)
 
 func Init() {
-	LBAlgorithms = map[string]func(server.ServersData){
+	LBAlgorithms = map[string]func(server.ServersData, string){
 		"iph": algorithms.IpHash,
 		"rnd": algorithms.Random,
 		"rr":  algorithms.RoundRobin,
