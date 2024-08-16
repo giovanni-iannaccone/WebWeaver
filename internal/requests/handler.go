@@ -9,6 +9,7 @@ import (
 	"utils"
 
 	"log"
+	"sync"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -17,10 +18,11 @@ import (
 var (
 	config  data.Config
 	servers server.ServersData
+	mu      sync.Mutex
 )
 
-// Calls the algorithms functions till it get an alive server
 func getNextServer(ip string) {
+
 	algorithmsData.LBAlgorithms[config.Algorithm](servers, ip)
 
 	for !servers.List[servers.Using].IsAlive {
@@ -28,38 +30,34 @@ func getNextServer(ip string) {
 	}
 }
 
-// Handle requests, call the function to determine the server, redirect here the request and write logs
 func requestHandler(ctx *fasthttp.RequestCtx) {
-	var str string
+	mu.Lock()
 	getNextServer(ctx.RemoteIP().String())
+	mu.Unlock()
 
 	if internals.IsProhibited(config.Prohibited, ctx.Path()) {
 		ctx.Error("404 not found", fasthttp.StatusNotFound)
+		return
+	}
 
-	} else {
-		ctx.Request.SetHost(
-			servers.List[servers.Using].URL.String(),
-		)
-
-		err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
-		if err != nil {
-			log.Print(err)
-		}
+	ctx.Request.SetHost(servers.List[servers.Using].URL.String())
+	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
+	if err != nil {
+		log.Print(err)
 	}
 
 	if config.Logs != "" {
-		str = " " + ctx.RemoteIP().String() + " " + string(ctx.Method()) + " " + string(ctx.Path())
+		str := " " + ctx.RemoteIP().String() + " " + string(ctx.Method()) + " " + string(ctx.Path())
 		log.Print(str)
 		go utils.WriteLogs(str, config.Logs)
 	}
 }
 
-// "Main" server function, define globals, register the handler and listen to incoming requests
 func StartListener(configurations data.Config, serversList server.ServersData) {
-	algorithmsData.Init()
-
+	mu.Lock()
 	config = configurations
 	servers = serversList
+	mu.Unlock()
 
 	if t := config.HealthCheck; t > 0 {
 		go healthcheck.StartHealthCheckTimer(t, &serversList)
