@@ -15,22 +15,23 @@ import (
 )
 
 var (
-	config data.Config
+	config  data.Config
 	servers server.ServersData
 )
 
-func getNextServer() {
-	algorithmsData.LBAlgorithms[config.Algorithm](servers)
+// Calls the algorithms functions till it get an alive server
+func getNextServer(ip string) {
+	algorithmsData.LBAlgorithms[config.Algorithm](servers, ip)
 
 	for !servers.List[servers.Using].IsAlive {
-		algorithmsData.LBAlgorithms[config.Algorithm](servers)
+		algorithmsData.LBAlgorithms[config.Algorithm](servers, ip)
 	}
 }
 
 // Handle requests, call the function to determine the server, redirect here the request and write logs
 func requestHandler(ctx *fasthttp.RequestCtx) {
 	var str string
-	getNextServer()
+	getNextServer(ctx.RemoteIP().String())
 
 	if internals.IsProhibited(config.Prohibited, ctx.Path()) {
 		ctx.Error("404 not found", fasthttp.StatusNotFound)
