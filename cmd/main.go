@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/url"
+	"os"
 
 	"data"
 	"data/algorithmsData"
@@ -36,6 +37,28 @@ func initializeServers(urlList []string, servers *server.ServersData) {
 	healthcheck.PrintHealthCheckStatus(servers)
 }
 
+// print help and return the configurations file path based on command line args
+func parseArguments(args []string) string {
+	for i := range args {
+		if args[i] == "--help" || args[i] == "-h" {
+			printHelp(args)
+			os.Exit(0)
+		} else if args[i] == "--config" || args[i] == "-c" {
+			return args[i + 1]
+		}
+	}
+
+	return "./configs/config.json"
+}
+
+// print help messages
+func printHelp(args []string) {
+	utils.Print(data.Reset, "%s\t\t--help\t | -h\t\tShow this screen\n", args[0])
+	utils.Print(data.Reset, "%s\t\t--config | -c\t\t Specify a configuration file\n", args[0])
+	utils.Print(data.Reset, "( if the configuration isn't specified, the file will be configs/config.json )\n\n")
+	utils.Print(data.Reset, "Example: %s -c config.json", args[0])
+}
+
 // if the configurations are valid, print them
 func printJsonData(config data.Config) {
 	utils.Print(data.Green, "[+] Using algorithm %s\n", config.Algorithm)
@@ -57,6 +80,8 @@ func printJsonData(config data.Config) {
 
 // main function, call functions to read json, setup configurations, print errors and start the server
 func main() {
+	var configFilePath string = parseArguments(os.Args)
+
 	var config data.Config
 	var servers server.ServersData
 
@@ -65,7 +90,7 @@ func main() {
 	utils.Print(data.Green, "===== Starting WebWeaver =====\n")
 	utils.Print(data.Green, "[+] Reading config files\n")
 
-	err := utils.ReadJson(&config, "./configs/config.json")
+	err := utils.ReadJson(&config, configFilePath)
 	if err != nil {
 		utils.Print(data.Red, err.Error())
 		return
