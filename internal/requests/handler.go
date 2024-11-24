@@ -16,11 +16,12 @@ import (
 )
 
 var (
-	config  data.Config
+	config  *data.Config
 	servers server.ServersData
 	mu      sync.Mutex
 )
 
+// obtain next server based on the algorithm
 func getNextServer(ip string) {
 
 	algorithmsData.LBAlgorithms[config.Algorithm](servers, ip)
@@ -30,6 +31,7 @@ func getNextServer(ip string) {
 	}
 }
 
+// handle request, send a well formed request to a server
 func requestHandler(ctx *fasthttp.RequestCtx) {
 	mu.Lock()
 	getNextServer(ctx.RemoteIP().String())
@@ -53,11 +55,11 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func StartListener(configurations data.Config, serversList server.ServersData) {
+// start the listener to receive requests
+func StartListener(configurations *data.Config, serversList server.ServersData) {
 	mu.Lock()
 	config = configurations
 	servers = serversList
-	mu.Unlock()
 
 	if t := config.HealthCheck; t > 0 {
 		go healthcheck.StartHealthCheckTimer(t, &serversList)
@@ -72,5 +74,6 @@ func StartListener(configurations data.Config, serversList server.ServersData) {
 		log.Fatal(err)
 	}
 
+	mu.Unlock()
 	select {}
 }

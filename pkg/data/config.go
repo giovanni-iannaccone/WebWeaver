@@ -19,15 +19,15 @@ func (config Config) CheckValidity() []string {
 	var errors []string
 
 	if _, exists := algorithmsData.LBAlgorithms[config.Algorithm]; !exists {
-		errors = append(errors, "[+] Unable to find algorithm "+config.Algorithm)
+		errors = append(errors, "[-] Unable to find algorithm "+config.Algorithm)
 	}
 
 	if len(config.Host) == 0 {
-		errors = append(errors, "[+] Set a valid host ")
+		errors = append(errors, "[-] Set a valid host ")
 	}
 
 	if len(config.Servers) == 0 {
-		errors = append(errors, "[+] No server found ")
+		errors = append(errors, "[-] No server found ")
 	}
 
 	return errors
