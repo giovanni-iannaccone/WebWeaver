@@ -32,9 +32,9 @@ func isServerAlive(u *url.URL) bool {
 func PrintHealthCheckStatus(servers *server.ServersData) {
 	for _, s := range servers.List {
 		if s.IsAlive {
-			utils.Print(data.Green, "[+] %s is alive\n", s.URL.String())
+			utils.Print(data.Green, "[+] %s\t\talive\n", s.URL.String())
 		} else {
-			utils.Print(data.Red, "[!] %s is NOT alive\n", s.URL.String())
+			utils.Print(data.Yellow, "[!] %s\t\tNOT alive\n", s.URL.String())
 		}
 	}
 }
