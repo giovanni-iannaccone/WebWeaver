@@ -18,9 +18,9 @@ We welcome contributions! Please follow these steps:
 - **Error Handling**: check all errors explicitly, avoid ignoring errors
 - **Formatting**: ensure your code is properly formatted using gofmt
 - **Imports**: organize imports into three sections:
-1. Standard library packages
-2. Internal project packages
-3. External libraries
+    1. Standard library packages
+    2. Internal project packages
+    3. External libraries
 
 Ensure all your tests pass before submitting a PR, update documentation if your changes affect the program's behaviour
 

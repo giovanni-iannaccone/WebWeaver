@@ -78,14 +78,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 
 
 ## 🧩 Contributing
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch ( using <a href="https://medium.com/@abhay.pixolo/naming-conventions-for-git-branches-a-cheatsheet-8549feca2534">this</a> convention).
-3. Make your changes and commit them with descriptive messages.
-4. Push your changes to your fork.
-5. Create a pull request to the main repository.
-
+Visit <a href="https://github.com/giovanni-iannaccone/WebWeaver/blob/main/CONTRIBUTING.md">CONTRIBUTING.md for more informations</a>
 
 ## 🔭 Learn
 Golang: https://go.dev/doc/ <br>
