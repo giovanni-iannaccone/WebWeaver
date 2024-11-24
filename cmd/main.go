@@ -27,20 +27,6 @@ func checkAndPrintErrors(config data.Config) bool {
 	return false
 }
 
-// put values inside data.config to merge with file configurations
-func initializeConfigurations() data.Config {
-	var config data.Config
-
-	config.Algorithm = ""
-	config.HealthCheck = -1
-	config.Host = ""
-	config.Logs = ""
-	config.Prohibited = nil
-	config.Servers = nil
-
-	return config
-}
-
 // create an array of servers based on URLs in config files
 func initializeServers(urlList []string, servers *server.ServersData) {
 	for _, serverStr := range urlList {
@@ -145,7 +131,7 @@ func main() {
 	var fileConfig data.Config
 	var servers server.ServersData
 
-	var config data.Config = initializeConfigurations()
+	var config data.Config
 	var configFilePath string = parseArguments(os.Args, &config)
 
 	algorithmsData.Init()
