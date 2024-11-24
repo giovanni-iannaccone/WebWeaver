@@ -13,7 +13,7 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 - **Security**: Includes configuration options for protection against common threats and connection management.
 
 
-## 👩‍💻 Installation
+## 👨‍💻 Installation
 
 ### 📜  Prerequisites
 
@@ -70,7 +70,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 
 ## 🎮 Usage
 
-1. Write your configurations in the configs/configs.json file
+1. Write your configurations in the configs/configs.json file or give it as an argument with ```--config``` or  ```-c``` flag
 2. Run the main file with go
 
 
