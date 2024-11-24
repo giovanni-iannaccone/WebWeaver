@@ -78,7 +78,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 
 
 ## 🧩 Contributing
-Visit <a href="https://github.com/giovanni-iannaccone/WebWeaver/blob/main/CONTRIBUTING.md">CONTRIBUTING.md for more informations</a>
+Visit <a href="https://github.com/giovanni-iannaccone/WebWeaver/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for more informations
 
 ## 🔭 Learn
 Golang: https://go.dev/doc/ <br>

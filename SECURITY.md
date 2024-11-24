@@ -1,0 +1,2 @@
+# 😱 Reporting a vulnerability
+We want to keep WebWeaver as safe as possible. If you've discovered a security vulnerability, we appreciate your help in disclosing it to us in a responsible manner, by creating a <a href="https://github.com/giovanni-iannaccone/WebWeaver/security/advisories">security advisory
