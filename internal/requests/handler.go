@@ -60,6 +60,7 @@ func StartListener(configurations *data.Config, serversList server.ServersData) 
 	mu.Lock()
 	config = configurations
 	servers = serversList
+	mu.Unlock()
 
 	if t := config.HealthCheck; t > 0 {
 		go healthcheck.StartHealthCheckTimer(t, &serversList)
@@ -74,6 +75,5 @@ func StartListener(configurations *data.Config, serversList server.ServersData) 
 		log.Fatal(err)
 	}
 
-	mu.Unlock()
 	select {}
 }

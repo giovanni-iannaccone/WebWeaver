@@ -111,18 +111,8 @@ func parseArguments(args []string, config *data.Config) string {
 	return "./configs/config.json"
 }
 
-// print help messages
-func printHelp(args []string) {
-	utils.Print(data.Reset, "%s\t\t--help\t | -h\t\tShow this screen\n", args[0])
-	utils.Print(data.Reset, "%s\t\t--config | -c\t\t Specify a configuration file\n", args[0])
-	utils.Print(data.Reset, "( if the configuration isn't specified, the file will be configs/config.json )\n\n")
-	utils.Print(data.Reset, "Example: %s -c config.json\n\n", args[0])
-	utils.Print(data.Reset, "Use a different value from the one in configurations by passing it as an arg\n")
-	utils.Print(data.Reset, "Example: %s --logs logs.txt", args[0])
-}
-
-// if the configurations are valid, print them
-func printJsonData(config data.Config) {
+// print configurations
+func printConfigData(config data.Config) {
 	utils.Print(data.Green, "[+] Using algorithm %s\n", config.Algorithm)
 	utils.Print(data.Green, "[+] Host: %s\n", config.Host)
 
@@ -138,6 +128,16 @@ func printJsonData(config data.Config) {
 	for _, dir := range config.Prohibited {
 		utils.Print(data.Gray, "\t- %s\n", dir)
 	}
+}
+
+// print help messages
+func printHelp(args []string) {
+	utils.Print(data.Reset, "%s\t\t--help\t | -h\t\tShow this screen\n", args[0])
+	utils.Print(data.Reset, "%s\t\t--config | -c\t\t Specify a configuration file\n", args[0])
+	utils.Print(data.Reset, "( if the configuration isn't specified, the file will be configs/config.json )\n\n")
+	utils.Print(data.Reset, "Example: %s -c config.json\n\n", args[0])
+	utils.Print(data.Reset, "Use a different value from the one in configurations by passing it as an arg\n")
+	utils.Print(data.Reset, "Example: %s --logs logs.txt", args[0])
 }
 
 // main function, call functions to read json, setup configurations, print errors and start the server
@@ -165,7 +165,7 @@ func main() {
 		return
 	}
 
-	printJsonData(config)
+	printConfigData(config)
 
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
 	initializeServers(config.Servers, &servers)
