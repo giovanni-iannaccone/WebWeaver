@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Algorithm   string   `json:"algorithm"`
 	Host        string   `json:"host"`
+	Dashboard	int 	 `json:"dashboard"`
 	Servers     []string `json:"servers"`
 	HealthCheck int      `json:"healthCheck"`
 	Logs        string   `json:"logs"`

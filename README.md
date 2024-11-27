@@ -48,6 +48,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 {
     "algorithm": "rnd",
     "host": "localhost:8080",
+    "dashboard": 8000,
     "servers": [
         "localhost:80",
         "localhost:8081"

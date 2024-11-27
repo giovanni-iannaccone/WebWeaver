@@ -14,7 +14,7 @@ import (
 	"webui"
 )
 
-// Call the function to check errors, if any, print them
+// calls the function to check errors, if any, print them
 func checkAndPrintErrors(config data.Config) bool {
 	errors := config.CheckValidity()
 	if errors != nil {
@@ -28,7 +28,7 @@ func checkAndPrintErrors(config data.Config) bool {
 	return false
 }
 
-// create an array of servers based on URLs in config files
+// creates an array of servers based on URLs in config files
 func initializeServers(urlList []string, servers *server.ServersData) {
 	for _, serverStr := range urlList {
 		parsedURL, err := url.Parse(serverStr)
@@ -44,19 +44,23 @@ func initializeServers(urlList []string, servers *server.ServersData) {
 	healthcheck.PrintHealthCheckStatus(servers)
 }
 
-// merge the configurations from the file and those from cli
+// merges the configurations from the file and those from cli
 func mergeConfigs(cli *data.Config, file data.Config) {
 	if cli.Algorithm == "" && file.Algorithm != cli.Algorithm {
 		cli.Algorithm = file.Algorithm
 	}
 
-	if cli.HealthCheck == -1 && file.HealthCheck != cli.HealthCheck {
-		cli.HealthCheck = file.HealthCheck
-	}
-
 	if cli.Host == "" && file.Host != cli.Host {
 		cli.Host = file.Host
 	} 
+
+	if cli.Dashboard < 0 && file.Dashboard != cli.Dashboard {
+		cli.Dashboard = file.Dashboard
+	} 
+
+	if cli.HealthCheck < 0 && file.HealthCheck != cli.HealthCheck {
+		cli.HealthCheck = file.HealthCheck
+	}
 
 	if cli.Logs == "" && file.Logs != cli.Logs {
 		cli.Logs = file.Logs
@@ -71,7 +75,7 @@ func mergeConfigs(cli *data.Config, file data.Config) {
 	} 
 }
 
-// print help and return the configurations file path based on command line args
+// prints help and returns the configurations file path based on command line args
 func parseArguments(args []string, config *data.Config) string {
 	for i := range args {
 		if args[i] == "--help" || args[i] == "-h" {
@@ -86,6 +90,9 @@ func parseArguments(args []string, config *data.Config) string {
 
 		} else if args[i] == "--host" {
 			config.Host = args[i + 1]
+		
+		} else if args[i] == "--dashboard" {
+			config.Dashboard, _ = strconv.Atoi(args[i + 1])
 
 		} else if args[i] == "--healthcheck" {
 			config.HealthCheck, _ = strconv.Atoi(args[i + 1])
@@ -98,10 +105,11 @@ func parseArguments(args []string, config *data.Config) string {
 	return "./configs/config.json"
 }
 
-// print configurations
+// prints configurations
 func printConfigData(config data.Config) {
 	utils.Print(data.Green, "[+] Using algorithm %s\n", config.Algorithm)
 	utils.Print(data.Green, "[+] Host: %s\n", config.Host)
+	utils.Print(data.Green, "[+] Dashboard: %d\n", config.Dashboard)
 
 	utils.Print(data.Green, "[+] Servers: \n")
 	for _, server := range config.Servers {
@@ -117,7 +125,7 @@ func printConfigData(config data.Config) {
 	}
 }
 
-// print help messages
+// prints help messages
 func printHelp(args []string) {
 	utils.Print(data.Reset, "%s\t\t--help\t | -h\t\tShow this screen\n", args[0])
 	utils.Print(data.Reset, "%s\t\t--config | -c\t\t Specify a configuration file\n", args[0])
@@ -127,15 +135,22 @@ func printHelp(args []string) {
 	utils.Print(data.Reset, "Example: %s --logs logs.txt", args[0])
 }
 
-// main function, call functions to read json, setup configurations, print errors and start the server
+// main function, calls functions to read json, setup configurations, prints errors and start the server
 func main() {
 	var fileConfig data.Config
 	var servers server.ServersData
 
-	var config data.Config
+	var config data.Config = data.Config{
+		Algorithm: "", 
+		Host: "", 
+		Dashboard: -1,
+		Servers: nil,
+		HealthCheck: -1,
+		Logs: "",
+		Prohibited: nil,
+	}
+
 	var configFilePath string = parseArguments(os.Args, &config)
-	 
-	var webUIPort uint16 = 8000
 
 	algorithmsData.Init()
 
@@ -156,8 +171,8 @@ func main() {
 
 	printConfigData(config)
 
-	webui.RenderUI(webUIPort)
-	utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", webUIPort)
+	webui.RenderUI(uint16(config.Dashboard))
+	utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
 
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
 	initializeServers(config.Servers, &servers)

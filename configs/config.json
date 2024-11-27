@@ -5,6 +5,7 @@
         "   - algorithm:    rr for Round Robin, rnd for random choice              ",
         "                   iph for ip hash                                        ",
         "   - host          the main server address                                ",
+        "   - dashboard     the port the dashboard html will run on                ",
         "   - servers:      write here your servers addresses and ports            ",
         "   - healthCheck:  seconds of the healthCheck timeout, put less           ",
         "                   than or 0 if you don't want the server to do any       ",
@@ -15,6 +16,7 @@
 
     "algorithm": "rnd",
     "host": "localhost:8080",
+    "dashboard": 8000,
     "servers": [
         "localhost:80",
         "localhost:8081"
