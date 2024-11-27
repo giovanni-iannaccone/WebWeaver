@@ -1,13 +1,14 @@
 go 1.21.5
 
 use (
-    ./cmd
-    ./internal
-    ./internal/healthCheck
-    ./internal/requests
-    ./pkg
-    ./pkg/data
-    ./pkg/data/algorithms
-    ./pkg/data/server
-    ./pkg/utils
+	./cmd
+	./internal
+	./internal/healthCheck
+	./internal/requests
+	./pkg
+	./pkg/data
+	./pkg/data/algorithms
+	./pkg/data/server
+	./pkg/utils
+	./webui
 )

@@ -1,16 +1,16 @@
 package requests
 
 import (
+	"log"
+	"sync"
+	"time"
+	
 	"data"
 	"data/algorithmsData"
 	"data/server"
 	"internals"
 	"internals/healthCheck"
 	"utils"
-
-	"log"
-	"sync"
-	"time"
 
 	"github.com/valyala/fasthttp"
 )

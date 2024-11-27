@@ -11,6 +11,7 @@ import (
 	"internals/healthCheck"
 	"internals/requests"
 	"utils"
+	"webui"
 )
 
 // Call the function to check errors, if any, print them
@@ -133,6 +134,8 @@ func main() {
 
 	var config data.Config
 	var configFilePath string = parseArguments(os.Args, &config)
+	 
+	var webUIPort uint16 = 8000
 
 	algorithmsData.Init()
 
@@ -152,6 +155,9 @@ func main() {
 	}
 
 	printConfigData(config)
+
+	webui.RenderUI(webUIPort)
+	utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", webUIPort)
 
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
 	initializeServers(config.Servers, &servers)

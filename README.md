@@ -1,4 +1,4 @@
-![Logo](https://github.com/user-attachments/assets/195bc208-0297-4128-83ed-d2a48b25cd83)
+<img src="assets/logo.png" alt="logo" title="WebWeaver"></img>
 
 # 🕸 WebWeaver
 
@@ -11,7 +11,7 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 - **Monitoring and Logging**: Provides detailed statistics and request logging for in-depth monitoring.
 - **Automatic Failover**: Manages automatic failover of unavailable backend servers.
 - **Security**: Includes configuration options for protection against common threats and connection management.
-
+- **Fast**: Thanks to the <a href="https://github.com/valyala/fasthttp">fasthttp</a> library, WebWeaver can quickly send packages across your network
 
 ## 👨‍💻 Installation
 
@@ -76,9 +76,8 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 1. Write your configurations in the configs/configs.json file or give it as an argument with ```--config``` or  ```-c``` flag
 2. Run the main file with go
 
-
 ## 🧩 Contributing
-Visit <a href="https://github.com/giovanni-iannaccone/WebWeaver/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for more informations
+Visit <a href="https://github.com/giovanni-iannaccone/WebWeaver/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
 
 ## 🔭 Learn
 Golang: https://go.dev/doc/ <br>
@@ -93,3 +92,5 @@ This project is licensed under the GPL-3.0 License. See the LICENSE file for det
 - For any inquiries or support, please contact <a href="mailto:iannacconegiovanni444@gmail.com"> iannacconegiovanni444@gmail.com </a>.
 - Visit my site for more informations about me and my work <a href="https://giovanni-iannaccone.gith
 ub.io" target=”_blank” rel="noopener noreferrer"> https://giovanni-iannaccone.github.io </a>
+
+# 📸 Screenshots
