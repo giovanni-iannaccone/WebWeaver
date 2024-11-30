@@ -14,7 +14,8 @@ We welcome contributions! Please follow these steps:
 - **Documentation**: add comments to explain complex logic, particularly when working with external libraries
 
 # 🎨 Code style
-- **Function naming**: use camelCase for function names
+- **Naming**: use camelCase for function names
+- **Types**: specify varibles types in declaration
 - **Error Handling**: check all errors explicitly, avoid ignoring errors
 - **Formatting**: ensure your code is properly formatted using gofmt
 - **Imports**: organize imports into three sections:
