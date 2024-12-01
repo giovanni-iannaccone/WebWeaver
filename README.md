@@ -6,12 +6,12 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 
 ## 📚 Features
 
-- **Load Balancing**: Distributes requests across backend servers using various strategies, including Round-Robin, Random and IP Hash.
-- **Dynamic Configuration**: Supports real-time configuration changes without needing a restart.
-- **Monitoring and Logging**: Provides detailed statistics and request logging for in-depth monitoring.
 - **Automatic Failover**: Manages automatic failover of unavailable backend servers.
-- **Security**: Includes configuration options for protection against common threats and connection management.
+- **Dynamic Configuration**: Supports real-time configuration changes without needing a restart.
 - **Fast**: Thanks to the <a href="https://github.com/valyala/fasthttp">fasthttp</a> library, WebWeaver can quickly send packages across your network
+- **Load Balancing**: Distributes requests across backend servers using various strategies, including Round-Robin, Random and IP Hash.
+- **Monitoring and Logging**: Provides detailed statistics and request logging for in-depth monitoring.
+- **Security**: Includes configuration options for protection against common threats and connection management.
 - **Web UI**: thank to <a href="https://htmx.org">HTMX</a> we can easly render a dashboard to give you detailed reports
 
 ## 👨‍💻 Installation
@@ -78,14 +78,13 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 1. Write your configurations in the configs/configs.json file or give it as an argument with ```--config``` or  ```-c``` flag
 2. Run the main file with go
 
-## 🧩 Contributing
-We welcome contributing. See CONTRIBUTING.md file for details
-
 ## 🔭 Learn
 Golang: https://go.dev/doc/ <br>
 HTMX: https://htmx.org/docs <br>
 Load Balancing: https://www.cloudflare.com/learning/performance/what-is-load-balancing/
 
+## 🧩 Contributing
+We welcome contributing. See CONTRIBUTING.md file for details
 
 ## ⚖ License
 This project is licensed under the GPL-3.0 License. See the LICENSE file for details.
