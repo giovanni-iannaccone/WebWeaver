@@ -12,17 +12,17 @@ import (
 
 var tpl *template.Template
 
-// Parses the template
+// parses the template
 func Init() {
     tpl = template.Must(template.ParseGlob("webui/templates/index.html"))
 }
 
-// Reads the configuration file and update the configurations
-func hotReload(config *data.Config) {
-	utils.ReadJson(config, config.Path)
+// reads the configuration file and update the configurations
+func hotReload(path string) data.Config {
+	return utils.ReadAndParseJson(path)
 }
 
-// Executes the template
+// executes the template
 func idx(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Content-Type", "text/html; charset=utf-8")
 
@@ -32,7 +32,7 @@ func idx(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// Renders the template on the given port
+// renders the template on the given port
 func RenderUI(config *data.Config) {
 	html := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
@@ -40,7 +40,7 @@ func RenderUI(config *data.Config) {
 			idx(ctx)
 		
 		case "/hot-reload/":
-			hotReload(config)
+			*config = hotReload(config.Path)
 
 		default:
 			ctx.Error("not found", fasthttp.StatusNotFound)
