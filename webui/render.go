@@ -23,10 +23,10 @@ func hotReload(path string) data.Config {
 }
 
 // executes the template
-func idx(ctx *fasthttp.RequestCtx) {
+func idx(ctx *fasthttp.RequestCtx, config data.Config) {
 	ctx.Response.Header.Set("Content-Type", "text/html; charset=utf-8")
 
-	err := tpl.ExecuteTemplate(ctx.Response.BodyWriter(), "index.html", nil)
+	err := tpl.ExecuteTemplate(ctx.Response.BodyWriter(), "index.html", config.Servers)
 	if err != nil {
 		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 	}
@@ -37,7 +37,7 @@ func RenderUI(config *data.Config) {
 	html := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
 		case "/":
-			idx(ctx)
+			idx(ctx, *config)
 		
 		case "/hot-reload/":
 			*config = hotReload(config.Path)

@@ -5,12 +5,152 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
+    
     <title>WebWeaver - Dashboard</title>
 </head>
 <body>
-    <h1>WebWeaver</h1>
-    <form hx-post="/hot-reload/">
-        <button type="submit">Hot Reload</button>
+    <nav>
+        <h1>WebWeaver</h1>
+
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+        </svg>          
+    </nav>
+
+    <form hx-put="/hot-reload/" hx-swap="outerHTML">
+        <button type="submit">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+            </svg>
+            Hot Reload
+        </button>
     </form>
+
+    <div id="server-holder">
+        {{ range . }}
+            <div class="server">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+                </svg>
+                
+                <p>{{ .URL }}</p>
+            </div>
+        {{ end }}
+    </div>
+
 </body>
 </html>
+
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+    }
+
+    nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+
+        background-color: #3b5998;
+        color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    nav h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 500;
+    }
+
+    nav svg {
+        width: 30px;
+        height: 30px;
+        fill: #fff;
+    }
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        background-color: #3b5998;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        margin: 20px;
+    }
+
+    button:hover {
+        background-color: #007bff;
+        transform: translateY(-2px);
+    }
+
+    button svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    #server-holder {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(7, 1fr);
+        padding: 20px;
+    }
+
+    .server {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        text-align: center;
+        font-size: 1rem;
+        color: #555;
+        font-weight: 400;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .server:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .server svg {
+        height: fit-content;
+        margin-bottom: 10px;
+    }
+
+
+    @media (max-width: 768px) {
+        nav h1 {
+            font-size: 1.5rem;
+        }
+
+        nav svg {
+            width: 25px;
+            height: 25px;
+        }
+
+        button {
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+
+        #server-holder {
+            padding: 10px;
+            gap: 15px;
+        }
+
+        .server {
+            padding: 15px;
+        }
+    }
+</style>
