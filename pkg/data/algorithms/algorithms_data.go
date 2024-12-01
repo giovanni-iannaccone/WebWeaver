@@ -1,17 +1,26 @@
 package algorithmsData
 
 import (
+	"errors"
+	
 	"data/server"
 	algorithms "internals"
 )
 
-// Load Balancing Algorithms
-var LBAlgorithms map[string]func(server.ServersData, string)
+type LoadBalancer interface {
+	NextServer(servers []server.Server, ip string) int
+}
 
-func Init() {
-	LBAlgorithms = map[string]func(server.ServersData, string){
-		"iph": algorithms.IpHash,
-		"rnd": algorithms.Random,
-		"rr":  algorithms.RoundRobin,
+// Load Balancing Algorithms
+func NewLoadBalancer(algorithm string) (LoadBalancer, error) {
+	switch algorithm {
+	case "iph":
+		return algorithms.IpHashAlgorithm{}, nil
+	case "rnd":
+		return algorithms.RandomAlgorithm{}, nil
+	case "rr":
+		return &algorithms.RoundRobinAlgorithm{}, nil
+	default:
+		return nil, errors.New("algoritmo sconosciuto")
 	}
 }

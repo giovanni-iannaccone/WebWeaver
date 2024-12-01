@@ -12,6 +12,7 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 - **Automatic Failover**: Manages automatic failover of unavailable backend servers.
 - **Security**: Includes configuration options for protection against common threats and connection management.
 - **Fast**: Thanks to the <a href="https://github.com/valyala/fasthttp">fasthttp</a> library, WebWeaver can quickly send packages across your network
+- **Web UI**: thank to <a href="https://htmx.org">HTMX</a> we can easly render a dashboard to give you detailed reports
 
 ## 👨‍💻 Installation
 
@@ -78,10 +79,11 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 2. Run the main file with go
 
 ## 🧩 Contributing
-Visit <a href="https://github.com/giovanni-iannaccone/WebWeaver/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+We welcome contributing. See CONTRIBUTING.md file for details
 
 ## 🔭 Learn
 Golang: https://go.dev/doc/ <br>
+HTMX: https://htmx.org/docs <br>
 Load Balancing: https://www.cloudflare.com/learning/performance/what-is-load-balancing/
 
 

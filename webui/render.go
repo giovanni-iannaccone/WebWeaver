@@ -4,11 +4,26 @@ import (
 	"fmt"
 	"html/template"
 
+	"data"
+	"utils"
+
 	"github.com/valyala/fasthttp"
 )
 
+var tpl *template.Template
+
+// Parses the template
+func Init() {
+    tpl = template.Must(template.ParseGlob("webui/templates/index.html"))
+}
+
+// Reads the configuration file and update the configurations
+func hotReload(config *data.Config) {
+	utils.ReadJson(config, config.Path)
+}
+
 // Executes the template
-func idx(ctx *fasthttp.RequestCtx, tpl *template.Template) {
+func idx(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.Set("Content-Type", "text/html; charset=utf-8")
 
 	err := tpl.ExecuteTemplate(ctx.Response.BodyWriter(), "index.html", nil)
@@ -18,19 +33,20 @@ func idx(ctx *fasthttp.RequestCtx, tpl *template.Template) {
 }
 
 // Renders the template on the given port
-func RenderUI(port uint16) {
-	tpl := template.Must(template.ParseFiles("webui/templates/index.html"))
-
+func RenderUI(config *data.Config) {
 	html := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
 		case "/":
-			idx(ctx, tpl)
+			idx(ctx)
+		
+		case "/hot-reload/":
+			hotReload(config)
+
 		default:
 			ctx.Error("not found", fasthttp.StatusNotFound)
 		}
 	}
 
-	addr := ":" + fmt.Sprint(port)
-
+	var addr string = ":" + fmt.Sprint(config.Dashboard)
 	go fasthttp.ListenAndServe(addr, html)
 }

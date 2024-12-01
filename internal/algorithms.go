@@ -1,29 +1,35 @@
 package internals
 
-// Load Balancing Algorithms implementations
-
 import (
 	"crypto/md5"
 	"encoding/binary"
 	"math/rand"
-
 	"data/server"
 )
 
-// Gives a server based on the hash of the ip asking
-func IpHash(serverList server.ServersData, ipAddress string) {
-	hash := md5.Sum([]byte(ipAddress))
+// returns the index of the next server based on requester ip hash
+type IpHashAlgorithm struct{}
+
+func (IpHashAlgorithm) NextServer(servers []server.Server, ip string) int {
+	hash := md5.Sum([]byte(ip))
 	hashInt := binary.BigEndian.Uint32(hash[:4])
 
-	serverList.Using = int(hashInt % uint32(len(serverList.List)))
+	return int(hashInt % uint32(len(servers)))
 }
 
-// Just gives the next server in the list
-func RoundRobin(serverList server.ServersData, _ string) {
-	serverList.Using = (serverList.Using + 1) % len(serverList.List)
+// returns the index of next server in the list
+type RoundRobinAlgorithm struct {
+	index int
 }
 
-// Gives a random server
-func Random(serverList server.ServersData, _ string) {
-	serverList.Using = rand.Int() % len(serverList.List)
+func (a *RoundRobinAlgorithm) NextServer(servers []server.Server, _ string) int {
+	a.index = (a.index + 1) % len(servers)
+	return a.index
+}
+
+// returns a random number
+type RandomAlgorithm struct{}
+
+func (RandomAlgorithm) NextServer(servers []server.Server, _ string) int {
+	return rand.Int() % len(servers)
 }

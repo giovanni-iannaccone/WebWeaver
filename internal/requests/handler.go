@@ -7,7 +7,6 @@ import (
 	
 	"data"
 	"data/algorithmsData"
-	"data/server"
 	"internals"
 	"internals/healthCheck"
 	"utils"
@@ -17,17 +16,20 @@ import (
 
 var (
 	config  *data.Config
-	servers server.ServersData
 	mu      sync.Mutex
+	using 	int
 )
 
-// obtain next server based on the algorithm
+// obtains next server based on the algorithm
 func getNextServer(ip string) {
+	lb, err := algorithmsData.NewLoadBalancer(config.Algorithm)
+	if err != nil {
+		utils.Print(data.Red, err.Error())
+		return
+	}
 
-	algorithmsData.LBAlgorithms[config.Algorithm](servers, ip)
-
-	for !servers.List[servers.Using].IsAlive {
-		algorithmsData.LBAlgorithms[config.Algorithm](servers, ip)
+	for !config.Servers[using].IsAlive {
+		using = lb.NextServer(config.Servers, ip)
 	}
 }
 
@@ -42,7 +44,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	ctx.Request.SetHost(servers.List[servers.Using].URL.String())
+	ctx.Request.SetHost(config.Servers[using].URL.String())
 	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
 	if err != nil {
 		log.Print(err)
@@ -56,14 +58,13 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 // start the listener to receive requests
-func StartListener(configurations *data.Config, serversList server.ServersData) {
+func StartListener(configurations *data.Config,) {
 	mu.Lock()
 	config = configurations
-	servers = serversList
 	mu.Unlock()
 
 	if t := config.HealthCheck; t > 0 {
-		go healthcheck.StartHealthCheckTimer(t, &serversList)
+		go healthcheck.StartHealthCheckTimer(&config.Servers, t)
 	}
 
 	s := &fasthttp.Server{

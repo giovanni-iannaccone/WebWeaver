@@ -7,17 +7,18 @@ We welcome contributions! Please follow these steps:
 4. Push your changes to your fork.
 5. Create a pull request to the main repository.
 
-# 👨‍💻 Development guidelines
+## 👨‍💻 Development guidelines
 - **Modularity**: functions should be small and focused on a single responsibility
 - **Separation of Concerns**: maintain clear separation between business logic and utility functions
 - **Error Handling**: handle errors gracefully. All errors should be logged using the utilities provided
 - **Documentation**: add comments to explain complex logic, particularly when working with external libraries
 
-# 🎨 Code style
-- **Naming**: use camelCase for function names
-- **Types**: specify varibles types in declaration
+## 🎨 Code style
+- **Naming**: use camelCase for function and variables names
+- **Types**: specify varibles types in declaration where it doesn't look redoundaunt
 - **Error Handling**: check all errors explicitly, avoid ignoring errors
 - **Formatting**: ensure your code is properly formatted using gofmt
+- **Comments**: add a one-line comment before every function to explain what will do
 - **Imports**: organize imports into three sections:
     1. Standard library packages
     2. Internal project packages

@@ -1,18 +1,16 @@
 package main
 
 import (
-	"net/url"
 	"os"
 	"strconv"
 
 	"data"
-	"data/algorithmsData"
-	"data/server"
-	"internals/healthCheck"
 	"internals/requests"
 	"utils"
 	"webui"
 )
+
+var config data.Config
 
 // calls the function to check errors, if any, print them
 func checkAndPrintErrors(config data.Config) bool {
@@ -26,22 +24,6 @@ func checkAndPrintErrors(config data.Config) bool {
 	}
 
 	return false
-}
-
-// creates an array of servers based on URLs in config files
-func initializeServers(urlList []string, servers *server.ServersData) {
-	for _, serverStr := range urlList {
-		parsedURL, err := url.Parse(serverStr)
-		if err != nil {
-			utils.Print(data.Red, "Invalid URL: %s\n", serverStr)
-			continue
-		}
-		
-		servers.List = append(servers.List, server.Server{URL: parsedURL})
-	}
-
-	healthcheck.HealthCheck(servers)
-	healthcheck.PrintHealthCheckStatus(servers)
 }
 
 // merges the configurations from the file and those from cli
@@ -113,7 +95,7 @@ func printConfigData(config data.Config) {
 
 	utils.Print(data.Green, "[+] Servers: \n")
 	for _, server := range config.Servers {
-		utils.Print(data.Gray, "\t- %s\n", server)
+		utils.Print(data.Gray, "\t- %s\n", server.URL.String())
 	}
 
 	utils.Print(data.Green, "[+] HealthCheck: %d\n", config.HealthCheck)
@@ -135,12 +117,9 @@ func printHelp(args []string) {
 	utils.Print(data.Reset, "Example: %s --logs logs.txt", args[0])
 }
 
-// main function, calls functions to read json, setup configurations, prints errors and start the server
-func main() {
-	var fileConfig data.Config
-	var servers server.ServersData
-
-	var config data.Config = data.Config{
+// init gets executed before the main
+func init() {
+	config = data.Config{
 		Algorithm: "", 
 		Host: "", 
 		Dashboard: -1,
@@ -150,20 +129,22 @@ func main() {
 		Prohibited: nil,
 	}
 
-	var configFilePath string = parseArguments(os.Args, &config)
+	webui.Init()
+}
 
-	algorithmsData.Init()
+// main function, calls functions to read json, setup configurations, prints errors and starts the server
+func main() {
+	var fileConfig data.Config
+
+	var configFilePath string = parseArguments(os.Args, &config)
 
 	utils.Print(data.Green, "===== Starting WebWeaver =====\n")
 	utils.Print(data.Green, "[+] Reading config files\n")
 
-	err := utils.ReadJson(&fileConfig, configFilePath)
-	if err != nil {
-		utils.Print(data.Red, err.Error())
-		return
-	}
+	fileConfig = utils.ReadAndParseJson(configFilePath)
 
 	mergeConfigs(&config, fileConfig)
+	config.Path = configFilePath
 
 	if checkAndPrintErrors(config) {
 		return
@@ -171,10 +152,9 @@ func main() {
 
 	printConfigData(config)
 
-	webui.RenderUI(uint16(config.Dashboard))
+	webui.RenderUI(&config)
 	utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
 
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
-	initializeServers(config.Servers, &servers)
-	requests.StartListener(&config, servers)
+	requests.StartListener(&config)
 }
