@@ -11,13 +11,16 @@ import (
 // reads the json and conver it to a better structure
 func ReadAndParseJson(path string) data.Config {
 	var rawConfig data.ConfigRaw
-	
-	err := ReadJson(&rawConfig, path)
-		if err != nil {
-			Print(data.Red, err.Error())
-		}
+	var config data.Config
 
-	return rawConfig.Cast()
+	err := ReadJson(&rawConfig, path)
+	if err != nil {
+		Print(data.Red, "%s %s", err.Error(), path)
+	}
+
+	config = rawConfig.Cast()
+	config.Path = path
+	return config
 }
 
 // reads a json file
