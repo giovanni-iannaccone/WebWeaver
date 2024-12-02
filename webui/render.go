@@ -14,7 +14,7 @@ var tpl *template.Template
 
 // parses the template
 func Init() {
-    tpl = template.Must(template.ParseGlob("webui/templates/index.html"))
+	tpl = template.Must(template.ParseGlob("webui/templates/index.html"))
 }
 
 // reads the configuration file and update the configurations
@@ -38,7 +38,7 @@ func RenderUI(config *data.Config) {
 		switch string(ctx.Path()) {
 		case "/":
 			idx(ctx, *config)
-		
+
 		case "/hot-reload/":
 			*config = hotReload(config.Path)
 

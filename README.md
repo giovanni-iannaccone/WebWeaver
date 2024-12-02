@@ -96,3 +96,4 @@ This project is licensed under the GPL-3.0 License. See the LICENSE file for det
 ub.io" target=”_blank” rel="noopener noreferrer"> https://giovanni-iannaccone.github.io </a>
 
 # 📸 Screenshots
+<img src="assets/dashboard.png" alt="Dashboard screenshot" title="Dashboard screenshot">
