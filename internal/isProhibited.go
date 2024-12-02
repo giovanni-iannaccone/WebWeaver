@@ -2,7 +2,7 @@ package internals
 
 func IsProhibited(prohibitedList []string, directory []byte) bool {
 	for _, dir := range prohibitedList {
-		if dir == string(directory) {
+		if string(directory)[:len(dir)] == dir {
 			return true
 		}
 	}
