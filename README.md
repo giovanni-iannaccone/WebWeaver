@@ -12,7 +12,7 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 - **Load Balancing**: Distributes requests across backend servers using various strategies, including Round-Robin, Random and IP Hash.
 - **Monitoring and Logging**: Provides detailed statistics and request logging for in-depth monitoring.
 - **Security**: Includes configuration options for protection against common threats and connection management.
-- **Web UI**: thank to <a href="https://htmx.org">HTMX</a> we can easly render a dashboard to give you detailed reports
+- **Web UI**: Thanks to WebSocket, we can easily render an auto-updating dashboard that provides real-time statistics about your servers
 
 ## 👨‍💻 Installation
 
@@ -67,6 +67,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 
 - algorithm: rr for Round Robin, rnd for random choice, iph for ip hash
 - host: the main server address
+- dashboard: the port dashboard will run on
 - servers: write here your servers addresses and ports
 - healthCheck:  seconds of the healthCheck timeout, put less than or 0 if you don't want the server to do any
 - logs: file where to save logs, put nothing between quotes if you don't want to save logs 
@@ -80,7 +81,6 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 
 ## 🔭 Learn
 Golang: https://go.dev/doc/ <br>
-HTMX: https://htmx.org/docs <br>
 Load Balancing: https://www.cloudflare.com/learning/performance/what-is-load-balancing/
 
 ## 🧩 Contributing

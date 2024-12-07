@@ -3,10 +3,12 @@ package webui
 import (
 	"fmt"
 	"html/template"
+	"path/filepath"
 
 	"data"
 	"utils"
 
+	//"github.com/gorilla/websocket"
 	"github.com/valyala/fasthttp"
 )
 
@@ -43,10 +45,29 @@ func RenderUI(config *data.Config) {
 			*config = hotReload(config.Path)
 
 		default:
-			ctx.Error("not found", fasthttp.StatusNotFound)
+			staticFileHandler(ctx)
 		}
 	}
 
 	var addr string = ":" + fmt.Sprint(config.Dashboard)
 	go fasthttp.ListenAndServe(addr, html)
+}
+
+func staticFileHandler(ctx *fasthttp.RequestCtx) {
+	var file = string(ctx.Path())
+	var staticDir = "webui/templates"
+	var fullPath = filepath.Join(staticDir, file)
+
+	ext := filepath.Ext(file)
+	switch ext {
+	case ".css":
+		ctx.Response.Header.Set("Content-Type", "text/css")
+	case ".js":
+		ctx.Response.Header.Set("Content-Type", "application/javascript")
+	default:
+		ctx.Error("not found", fasthttp.StatusNotFound)
+		return
+	}
+
+	fasthttp.ServeFile(ctx, fullPath)
 }

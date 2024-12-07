@@ -152,9 +152,11 @@ func main() {
 
 	printConfigData(config)
 
-	webui.RenderUI(&config)
-	utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
-
+	if (config.Dashboard >= 0) {
+		webui.RenderUI(&config)
+		utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
+	}
+	
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
 	requests.StartListener(&config)
 }
