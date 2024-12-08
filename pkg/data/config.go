@@ -23,7 +23,7 @@ func (rawConfig ConfigRaw) Cast() Config {
 
 	for _, serverString := range rawConfig.Servers {
 		parsedURL, _ := url.Parse(serverString)
-		servers = append(servers, server.Server{URL: parsedURL, IsAlive: false})
+		servers = append(servers, server.Server{URL: *parsedURL, IsAlive: false})
 	}
 
 	return Config {

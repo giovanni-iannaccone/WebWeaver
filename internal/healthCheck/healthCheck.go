@@ -18,7 +18,7 @@ func HealthCheck(servers []server.Server) {
 }
 
 // sends a request to the server to check if it is alive
-func isServerAlive(u *url.URL) bool {
+func isServerAlive(u url.URL) bool {
 	var timeout time.Duration = 2 * time.Second
 
 	conn, err := net.DialTimeout("tcp", u.String(), timeout)

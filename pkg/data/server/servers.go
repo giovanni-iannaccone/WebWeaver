@@ -5,6 +5,6 @@ import (
 )
 
 type Server struct {
-	URL     *url.URL
+	URL     url.URL
 	IsAlive bool
 }
