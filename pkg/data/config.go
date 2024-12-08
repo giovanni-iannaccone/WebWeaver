@@ -49,9 +49,16 @@ type Config struct {
 	Prohibited  []string
 }
 
-// Checks for configuration validity: a valid algorithm and Server field not empt
+// Checks for configuration validity: a valid algorithm, Servers and Host field not empty
 func (config Config) CheckValidity() []string {
 	var errors []string
+
+	switch config.Algorithm {
+	case "rnd", "rr", "iph":
+		break
+	default:
+		errors = append(errors, "[-] Set a valid algorithm (rnd, rr, iph)")
+	}
 
 	if len(config.Host) == 0 {
 		errors = append(errors, "[-] Set a valid host ")

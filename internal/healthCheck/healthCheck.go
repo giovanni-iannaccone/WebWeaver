@@ -10,7 +10,7 @@ import (
 	"utils"
 )
 
-// checks if all servers are alive	
+// checks if all servers are alive 
 func HealthCheck(servers []server.Server) {
 	for i := range servers {
 		servers[i].IsAlive = isServerAlive(servers[i].URL)

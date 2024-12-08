@@ -15,11 +15,12 @@
     ],
 
     "algorithm": "rnd",
-    "host": "localhost:8080",
-    "dashboard": 8000,
+    "host": "localhost:9000",
+    "dashboard": 9001,
+
     "servers": [
         "localhost:80",
-        "localhost:8081"
+        "localhost:81"
     ],
     
     "healthCheck": 10,

@@ -48,11 +48,12 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 ```json
 {
     "algorithm": "rnd",
-    "host": "localhost:8080",
-    "dashboard": 8000,
+    "host": "localhost:9000",
+    "dashboard": 9001,
+
     "servers": [
         "localhost:80",
-        "localhost:8081"
+        "localhost:81"
     ],
     
     "healthCheck": 10,
@@ -67,7 +68,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 
 - algorithm: rr for Round Robin, rnd for random choice, iph for ip hash
 - host: the main server address
-- dashboard: the port dashboard will run on
+- dashboard: the port dashboard will run on  
 - servers: write here your servers addresses and ports
 - healthCheck:  seconds of the healthCheck timeout, put less than or 0 if you don't want the server to do any
 - logs: file where to save logs, put nothing between quotes if you don't want to save logs 
