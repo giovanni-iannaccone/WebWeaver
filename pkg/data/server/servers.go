@@ -32,12 +32,12 @@ func (s *Servers) RemoveObserver(obs chan bool) {
 	}
 }
 
-func (s *Servers) NotifyObservers(message bool) {
+func (s *Servers) NotifyObservers() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for _, observer := range s.observers {
 		go func(ch chan bool) {
-			ch <- message
+			ch <- true
 		}(observer)
 	}
 }

@@ -24,7 +24,7 @@ func HealthCheck(servers *server.Servers) {
 	}
 
 	if updatedAnyServer {
-		servers.NotifyObservers(updatedAnyServer)
+		servers.NotifyObservers()
 	}
 }
 

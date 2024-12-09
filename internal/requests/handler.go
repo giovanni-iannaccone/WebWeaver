@@ -58,7 +58,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 // start the listener to receive requests
-func StartListener(configurations *data.Config,) {
+func StartListener(configurations *data.Config) {
 	mu.Lock()
 	config = configurations
 	mu.Unlock()
@@ -75,6 +75,4 @@ func StartListener(configurations *data.Config,) {
 	if err := s.ListenAndServe(config.Host); err != nil {
 		log.Fatal(err)
 	}
-
-	select {}
 }
