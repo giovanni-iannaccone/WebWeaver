@@ -8,7 +8,7 @@ import (
 )
 
 type LoadBalancer interface {
-	NextServer(servers []server.Server, ip string) int
+	NextServer(servers *[]server.ServerData, ip string) int
 }
 
 // Load Balancing Algorithms
@@ -21,6 +21,6 @@ func NewLoadBalancer(algorithm string) (LoadBalancer, error) {
 	case "rr":
 		return &algorithms.RoundRobinAlgorithm{}, nil
 	default:
-		return nil, errors.New("algoritmo sconosciuto")
+		return nil, errors.New("nknown algorithm")
 	}
 }

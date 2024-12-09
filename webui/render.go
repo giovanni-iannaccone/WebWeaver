@@ -4,93 +4,96 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"net/http"
 	"path/filepath"
 
 	"data"
 	"data/server"
 	"utils"
 
-	"github.com/valyala/fasthttp"
+	"github.com/gorilla/websocket"
 )
-
-type pageData struct {
-	Servers []server.Server
-	Port 	int
-}
 
 var tpl *template.Template
 
-// parses the template
+// parses the HTML templates
 func Init() {
 	tpl = template.Must(template.ParseGlob("webui/templates/index.html"))
 }
 
-// reads the configuration file and update the configurations
+// reads the configuration file and updates the configurations
 func hotReload(config *data.Config) {
 	*config = utils.ReadAndParseJson(config.Path)
 }
 
-// executes the template
-func idx(ctx *fasthttp.RequestCtx, pd pageData) {
-	ctx.Response.Header.Set("Content-Type", "text/html; charset=utf-8")
-
-	err := tpl.ExecuteTemplate(ctx.Response.BodyWriter(), "index.html", pd)
-	if err != nil {
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+// renders the template with server data
+func idx(w http.ResponseWriter, r *http.Request, servers []server.ServerData) {
+	if err := tpl.ExecuteTemplate(w, "index.html", servers); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-// renders the template on the given port
+// starts the HTTP server and handles routing
 func RenderUI(config *data.Config) {
-	var pd = pageData{config.Servers, config.Dashboard}
+	var obs = make(chan bool)
+	config.Servers.AddObserver(obs)
 
-	html := func(ctx *fasthttp.RequestCtx) {
-		switch string(ctx.Path()) {
-		case "/":
-			idx(ctx, pd)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		idx(w, r, config.Servers.Data)
+	})
+	http.HandleFunc("/hot-reload/", func(w http.ResponseWriter, r *http.Request) {
+		hotReload(config)
+	})
+	http.HandleFunc("/ws/", func(w http.ResponseWriter, r *http.Request) {
+		if err := sendData(w, r, config.Servers, obs); err != nil {
+			utils.Print(data.Red, err.Error())
+		}
+	})
+	http.HandleFunc("/static/", staticFileHandler)
 
-		case "/hot-reload/":
-			hotReload(config)
-		
-		case "/ws/":
-			sendData(ctx, config.Servers)
+	addr := fmt.Sprintf(":%d", config.Dashboard)
+	go http.ListenAndServe(addr, nil)
+}
 
-		default:
-			staticFileHandler(ctx)
+// establishes a WebSocket connection and sends data to the client
+func sendData(w http.ResponseWriter, r *http.Request, servers *server.Servers, obs chan bool) error {
+	ws := data.GetWebSocket()
+
+	err := ws.UpgradeToWS(w, r)
+	if err != nil {
+		return err
+	}
+
+	defer ws.Conn.Close()
+
+	for range obs {
+		bytes, _ := json.Marshal(servers)
+
+		err := ws.Conn.WriteMessage(websocket.TextMessage, bytes)
+		if err != nil {
+			return err
 		}
 	}
 
-	var addr string = ":" + fmt.Sprint(config.Dashboard)
-	go fasthttp.ListenAndServe(addr, html)
+	return nil
 }
 
-// sends data to the webpage using a websocket
-func sendData(ctx *fasthttp.RequestCtx, servers []server.Server) {
-	var ws = data.GetWebSocket()
-	ws.UpgradeToWS(ctx)
+// serves static files like CSS and JavaScript
+func staticFileHandler(w http.ResponseWriter, r *http.Request) {
+	var staticDir = "webui"
+	var file = r.URL.Path
+	var fullPath = filepath.Join(staticDir, filepath.Clean(file))
 
-	data, err := json.Marshal(servers)
-	if err != nil {
-		ws.Conn.WriteMessage(1, data)
-	}
-}
-
-// servers static files like css and js
-func staticFileHandler(ctx *fasthttp.RequestCtx) {
-	var file = string(ctx.Path())
-	var staticDir = "webui/templates"
-	var fullPath = filepath.Join(staticDir, file)
-
-	ext := filepath.Ext(file)
+	var ext = filepath.Ext(file)
 	switch ext {
 	case ".css":
-		ctx.Response.Header.Set("Content-Type", "text/css")
+		w.Header().Set("Content-Type", "text/css")
 	case ".js":
-		ctx.Response.Header.Set("Content-Type", "application/javascript")
+		w.Header().Set("Content-Type", "application/javascript")
 	default:
-		ctx.Error("not found", fasthttp.StatusNotFound)
+		http.NotFound(w, r)
 		return
 	}
 
-	fasthttp.ServeFile(ctx, fullPath)
+	http.ServeFile(w, r, fullPath)
 }

@@ -7,6 +7,8 @@ We welcome contributions! Please follow these steps:
 4. Push your changes to your fork.
 5. Create a pull request to the main repository.
 
+Read <a href="/docs/">documentation</a> to know more about the actual implementation of WebWeaver
+
 ## 👨‍💻 Development guidelines
 - **Modularity**: functions should be small and focused on a single responsibility
 - **Separation of Concerns**: maintain clear separation between business logic and utility functions

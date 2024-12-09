@@ -1,8 +1,6 @@
 package data
 
 import (
-	"net/url"
-
 	"data/server"
 )
 
@@ -19,18 +17,18 @@ type ConfigRaw struct {
 
 // converts configurations from a raw format to the right format
 func (rawConfig ConfigRaw) Cast() Config {
-	var servers []server.Server
+	var servers server.Servers
 
 	for _, serverString := range rawConfig.Servers {
-		parsedURL, _ := url.Parse(serverString)
-		servers = append(servers, server.Server{URL: *parsedURL, IsAlive: false})
+		var serverData = server.ServerData{URL: serverString, IsAlive: false}
+		servers.Data = append(servers.Data, serverData)
 	}
 
 	return Config {
 		Algorithm:   rawConfig.Algorithm,
 		Host:        rawConfig.Host,
 		Dashboard:   rawConfig.Dashboard,
-		Servers:     servers,
+		Servers:     &servers,
 		HealthCheck: rawConfig.HealthCheck,
 		Logs:        rawConfig.Logs,
 		Prohibited:  rawConfig.Prohibited,
@@ -43,7 +41,7 @@ type Config struct {
 	Algorithm   string
 	Host        string
 	Dashboard   int
-	Servers     []server.Server
+	Servers     *server.Servers
 	HealthCheck int
 	Logs        string
 	Prohibited  []string
@@ -64,7 +62,7 @@ func (config Config) CheckValidity() []string {
 		errors = append(errors, "[-] Set a valid host ")
 	}
 
-	if len(config.Servers) == 0 {
+	if len(config.Servers.Data) == 0 {
 		errors = append(errors, "[-] No server found ")
 	}
 

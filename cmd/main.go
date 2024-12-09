@@ -52,7 +52,7 @@ func mergeConfigs(cli *data.Config, file data.Config) {
 		cli.Prohibited = file.Prohibited
 	} 
 
-	if cli.Servers == nil && len(file.Servers) > 0 {
+	if cli.Servers == nil && len(file.Servers.Data) > 0 {
 		cli.Servers = file.Servers
 	} 
 }
@@ -94,8 +94,8 @@ func printConfigData(config data.Config) {
 	utils.Print(data.Green, "[+] Dashboard: %d\n", config.Dashboard)
 
 	utils.Print(data.Green, "[+] Servers: \n")
-	for _, server := range config.Servers {
-		utils.Print(data.Gray, "\t- %s\n", server.URL.String())
+	for i := range config.Servers.Data {
+		utils.Print(data.Gray, "\t- %s\n", config.Servers.Data[i].URL)
 	}
 
 	utils.Print(data.Green, "[+] HealthCheck: %d\n", config.HealthCheck)

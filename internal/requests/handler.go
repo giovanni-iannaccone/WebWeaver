@@ -28,8 +28,8 @@ func getNextServer(ip string) {
 		return
 	}
 
-	for !config.Servers[using].IsAlive {
-		using = lb.NextServer(config.Servers, ip)
+	for !config.Servers.Data[using].IsAlive {
+		using = lb.NextServer(&config.Servers.Data, ip)
 	}
 }
 
@@ -44,7 +44,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	ctx.Request.SetHost(config.Servers[using].URL.String())
+	ctx.Request.SetHost(config.Servers.Data[using].URL)
 	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
 	if err != nil {
 		log.Print(err)
@@ -64,7 +64,7 @@ func StartListener(configurations *data.Config,) {
 	mu.Unlock()
 
 	if t := config.HealthCheck; t > 0 {
-		go healthcheck.StartHealthCheckTimer(&config.Servers, t)
+		go healthcheck.StartHealthCheckTimer(config.Servers, t)
 	}
 
 	s := &fasthttp.Server{
