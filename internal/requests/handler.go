@@ -64,7 +64,7 @@ func StartListener(configurations *data.Config,) {
 	mu.Unlock()
 
 	if t := config.HealthCheck; t > 0 {
-		go healthcheck.StartHealthCheckTimer(config.Servers, t)
+		go healthcheck.StartHealthCheckTimer(config.Servers, t, config.Dashboard < 0)
 	}
 
 	s := &fasthttp.Server{

@@ -52,12 +52,14 @@ func PrintHealthCheckStatus(servers *server.Servers) {
 }
 
 // starts the health check timer, call the healthcheck function every time the timer expires
-func StartHealthCheckTimer(servers *server.Servers, seconds int) {
+func StartHealthCheckTimer(servers *server.Servers, seconds int, printHealthCheckResult bool) {
 	t := time.NewTicker(time.Second * time.Duration(seconds))
 	defer t.Stop()
 
 	for range t.C {
         HealthCheck(servers)
-        PrintHealthCheckStatus(servers)
+		if printHealthCheckResult {
+        	PrintHealthCheckStatus(servers)
+		}
     }
 }
