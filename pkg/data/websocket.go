@@ -14,17 +14,17 @@ type WebSocket struct {
 }
 
 var (
-	instance *WebSocket
-	once     sync.Once
+	wsInstance *WebSocket
+	wsOnce     sync.Once
 )
 
 func GetWebSocket() *WebSocket {
-	once.Do(func() {
-		instance = &WebSocket{
+	wsOnce.Do(func() {
+		wsInstance = &WebSocket{
 			upgrader: websocket.Upgrader{},
 		}
 	})
-	return instance
+	return wsInstance
 }
 
 // upgrades http connection to websocket

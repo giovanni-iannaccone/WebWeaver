@@ -58,8 +58,8 @@ func StartHealthCheckTimer(servers *server.Servers, seconds int, printHealthChec
 
 	for range t.C {
         HealthCheck(servers)
-		if printHealthCheckResult {
-        	PrintHealthCheckStatus(servers)
-		}
+		// if printHealthCheckResult {
+        PrintHealthCheckStatus(servers)
+		// }
     }
 }

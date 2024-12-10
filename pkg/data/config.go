@@ -1,6 +1,8 @@
 package data
 
 import (
+	"sync"
+
 	"data/server"
 )
 
@@ -17,7 +19,8 @@ type ConfigRaw struct {
 
 // converts configurations from a raw format to the right format
 func (rawConfig ConfigRaw) Cast() Config {
-	var servers server.Servers
+	var servers *server.Servers = GetConfig().Servers
+	servers.Data = []server.ServerData{}
 
 	for _, serverString := range rawConfig.Servers {
 		var serverData = server.ServerData{URL: serverString, IsAlive: false}
@@ -28,14 +31,15 @@ func (rawConfig ConfigRaw) Cast() Config {
 		Algorithm:   rawConfig.Algorithm,
 		Host:        rawConfig.Host,
 		Dashboard:   rawConfig.Dashboard,
-		Servers:     &servers,
+		Servers:     servers,
 		HealthCheck: rawConfig.HealthCheck,
 		Logs:        rawConfig.Logs,
 		Prohibited:  rawConfig.Prohibited,
 	}
 }
 
-// the final struct used by the program
+// singleton for the configuration
+
 type Config struct {
 	Path        string
 	Algorithm   string
@@ -45,6 +49,23 @@ type Config struct {
 	HealthCheck int
 	Logs        string
 	Prohibited  []string
+}
+
+var (
+	configInstance *Config
+	configOnce     sync.Once
+)
+
+func GetConfig() *Config {
+	configOnce.Do(func() {
+		configInstance = &Config{
+			Servers: &server.Servers{
+				Data: []server.ServerData{},
+			},
+		}
+	})
+
+	return configInstance
 }
 
 // Checks for configuration validity: a valid algorithm, Servers and Host field not empty
