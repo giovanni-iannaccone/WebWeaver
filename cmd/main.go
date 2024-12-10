@@ -1,8 +1,7 @@
 package main
 
 import (
-	"os"
-	"strconv"
+	"flag"
 
 	"data"
 	"internals/requests"
@@ -10,14 +9,12 @@ import (
 	"webui"
 )
 
-var config data.Config
-
 // calls the function to check errors, if any, print them
 func checkAndPrintErrors(config data.Config) bool {
 	errors := config.CheckValidity()
 	if errors != nil {
 		for _, err := range errors {
-			utils.Print(data.Red, err)
+			utils.Print(data.Red, "%s\n", err)
 		}
 
 		return true
@@ -48,47 +45,26 @@ func mergeConfigs(cli *data.Config, file data.Config) {
 		cli.Logs = file.Logs
 	} 
 
-	if cli.Prohibited == nil && len(file.Prohibited) > 0 {
-		cli.Prohibited = file.Prohibited
-	} 
-
-	if cli.Servers == nil && len(file.Servers.Data) > 0 {
-		cli.Servers = file.Servers
-	} 
+	cli.Prohibited = file.Prohibited
+	cli.Servers = file.Servers
 }
 
-// prints help and returns the configurations file path based on command line args
-func parseArguments(args []string, config *data.Config) string {
-	for i := range args {
-		if args[i] == "--help" || args[i] == "-h" {
-			printHelp(args)
-			os.Exit(0)
+func parseFlags(path *string, config *data.Config) {
+	flag.StringVar(path, "config", "./configs/config.json", "Config file path")
+	flag.StringVar(&config.Algorithm, "algorithm", "", "Algorithm we will use to send packages")
+	flag.StringVar(&config.Host, "host", "", "Address load balancer will listen on")
+	flag.StringVar(&config.Logs, "logs", "", "File where logs will be saved")
 
-		} else if args[i] == "--config" || args[i] == "-c" {
-			return args[i + 1]
+	flag.IntVar(&config.Dashboard, "dashboard", -1, "Port where to start the dashboard")
+	flag.IntVar(&config.HealthCheck, "healthcheck", -1, "Healthcheck timer")
 
-		} else if args[i] == "--algorithm" {
-			config.Algorithm = args[i + 1]
-
-		} else if args[i] == "--host" {
-			config.Host = args[i + 1]
-		
-		} else if args[i] == "--dashboard" {
-			config.Dashboard, _ = strconv.Atoi(args[i + 1])
-
-		} else if args[i] == "--healthcheck" {
-			config.HealthCheck, _ = strconv.Atoi(args[i + 1])
-
-		} else if args[i] == "--logs" {
-			config.Logs = args[i + 1]
-		}
-	}
-
-	return "./configs/config.json"
+	flag.Parse()
 }
 
 // prints configurations
-func printConfigData(config data.Config) {
+func printConfigData() {
+	var config data.Config = *data.GetConfig()
+	
 	utils.Print(data.Green, "[+] Using algorithm %s\n", config.Algorithm)
 	utils.Print(data.Green, "[+] Host: %s\n", config.Host)
 	utils.Print(data.Green, "[+] Dashboard: %d\n", config.Dashboard)
@@ -108,7 +84,7 @@ func printConfigData(config data.Config) {
 }
 
 // prints help messages
-func printHelp(args []string) {
+/*func printHelp(args []string) {
 	utils.Print(data.Reset, "%s\t\t--help\t | -h\t\tShow this screen\n", args[0])
 	utils.Print(data.Reset, "%s\t\t--config | -c\t\t Specify a configuration file\n", args[0])
 	utils.Print(data.Reset, "( if the configuration isn't specified, the file will be configs/config.json )\n\n")
@@ -116,47 +92,40 @@ func printHelp(args []string) {
 	utils.Print(data.Reset, "Use a different value from the one in configurations by passing it as an arg\n")
 	utils.Print(data.Reset, "Example: %s --logs logs.txt", args[0])
 }
-
+*/
 // init gets executed before the main
 func init() {
-	config = data.Config{
-		Algorithm: "", 
-		Host: "", 
-		Dashboard: -1,
-		Servers: nil,
-		HealthCheck: -1,
-		Logs: "",
-		Prohibited: nil,
-	}
-
 	webui.Init()
 }
 
 // main function, calls functions to read json, setup configurations, prints errors and starts the server
 func main() {
-	var fileConfig data.Config
+	var configFilePath string
 
-	var configFilePath string = parseArguments(os.Args, &config)
+	var fileConfig data.Config
+	var config *data.Config = data.GetConfig()
+
+	parseFlags(&configFilePath, config)
 
 	utils.Print(data.Green, "===== Starting WebWeaver =====\n")
 	utils.Print(data.Green, "[+] Reading config files\n")
 
 	fileConfig = utils.ReadAndParseJson(configFilePath)
 
-	mergeConfigs(&config, fileConfig)
+	mergeConfigs(config, fileConfig)
 	config.Path = configFilePath
 
-	if checkAndPrintErrors(config) {
+	if checkAndPrintErrors(*config) {
 		return
 	}
 
-	printConfigData(config)
+	printConfigData()
 
 	if (config.Dashboard >= 0) {
-		webui.RenderUI(&config)
+		webui.RenderUI()
 		utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
 	}
 	
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
-	requests.StartListener(&config)
+	requests.StartListener()
 }
