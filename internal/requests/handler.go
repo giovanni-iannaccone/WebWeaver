@@ -15,13 +15,14 @@ import (
 )
 
 var (
-	config  *data.Config
-	mu      sync.Mutex
+	mu 		sync.Mutex
 	using 	int
 )
 
 // obtains next server based on the algorithm
 func getNextServer(ip string) {
+	var config = data.GetConfig()
+
 	lb, err := algorithmsData.NewLoadBalancer(config.Algorithm)
 	if err != nil {
 		utils.Print(data.Red, err.Error())
@@ -35,6 +36,8 @@ func getNextServer(ip string) {
 
 // handle request, send a well formed request to a server
 func requestHandler(ctx *fasthttp.RequestCtx) {
+	var config = data.GetConfig()
+
 	mu.Lock()
 	getNextServer(ctx.RemoteIP().String())
 	mu.Unlock()
@@ -58,10 +61,8 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 // start the listener to receive requests
-func StartListener(configurations *data.Config) {
-	mu.Lock()
-	config = configurations
-	mu.Unlock()
+func StartListener() {
+	var config = data.GetConfig()
 
 	if t := config.HealthCheck; t > 0 {
 		go healthcheck.StartHealthCheckTimer(config.Servers, t, config.Dashboard < 0)

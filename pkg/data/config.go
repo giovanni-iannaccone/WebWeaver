@@ -58,6 +58,7 @@ var (
 
 func GetConfig() *Config {
 	configOnce.Do(func() {
+
 		configInstance = &Config{
 			Servers: &server.Servers{
 				Data: []server.ServerData{},

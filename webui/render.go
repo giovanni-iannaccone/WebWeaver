@@ -34,8 +34,9 @@ func idx(w http.ResponseWriter, r *http.Request, servers []server.ServerData) {
 }
 
 // starts the HTTP server and handles routing
-func RenderUI(config *data.Config) {
+func RenderUI() {
 	var obs = make(chan bool)
+	var config = data.GetConfig()
 	config.Servers.AddObserver(obs)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
