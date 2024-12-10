@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"data"
 	"internals/requests"
@@ -49,6 +50,7 @@ func mergeConfigs(cli *data.Config, file data.Config) {
 	cli.Servers = file.Servers
 }
 
+// parses flags using the flag package
 func parseFlags(path *string, config *data.Config) {
 	flag.StringVar(path, "config", "./configs/config.json", "Config file path")
 	flag.StringVar(&config.Algorithm, "algorithm", "", "Algorithm we will use to send packages")
@@ -58,6 +60,7 @@ func parseFlags(path *string, config *data.Config) {
 	flag.IntVar(&config.Dashboard, "dashboard", -1, "Port where to start the dashboard")
 	flag.IntVar(&config.HealthCheck, "healthcheck", -1, "Healthcheck timer")
 
+	flag.BoolFunc("help", "Show help screen", printHelp)
 	flag.Parse()
 }
 
@@ -84,15 +87,20 @@ func printConfigData() {
 }
 
 // prints help messages
-/*func printHelp(args []string) {
-	utils.Print(data.Reset, "%s\t\t--help\t | -h\t\tShow this screen\n", args[0])
-	utils.Print(data.Reset, "%s\t\t--config | -c\t\t Specify a configuration file\n", args[0])
-	utils.Print(data.Reset, "( if the configuration isn't specified, the file will be configs/config.json )\n\n")
-	utils.Print(data.Reset, "Example: %s -c config.json\n\n", args[0])
+func printHelp(_ string) error {
+	var binaryName string = os.Args[0]
+
+	utils.Print(data.Reset, "%s\t\t--help\t\tShow this screen\n", binaryName)
+	utils.Print(data.Reset, "%s\t\t--config\tSpecify a configuration file\n", binaryName)
+	utils.Print(data.Reset, "( if the configuration isn't specified, the file will be ./configs/config.json )\n\n")
+	utils.Print(data.Reset, "Example: %s -c config.json\n\n", binaryName)
 	utils.Print(data.Reset, "Use a different value from the one in configurations by passing it as an arg\n")
-	utils.Print(data.Reset, "Example: %s --logs logs.txt", args[0])
+	utils.Print(data.Reset, "Example: %s --logs logs.txt", binaryName)
+	
+	os.Exit(0)
+	return nil
 }
-*/
+
 // init gets executed before the main
 func init() {
 	webui.Init()
