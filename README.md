@@ -36,9 +36,14 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
     go run ./cmd/main.go
     ```
 
-    or compile it with 
+    or compile it with golang
     ```sh
     go build ./cmd
+    ```
+
+    or using makefile
+    ```sh
+    make YOUR_OPERATING_SYSTEM
     ```
 
 ## ⚙ Configuration
@@ -77,8 +82,12 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 
 ## 🎮 Usage
 
+<img src="assets/network.png" alt="network scheme" title="network scheme">
+
 1. Write your configurations in the configs/configs.json file or give it as an argument with ```--config``` or  ```-c``` flag
 2. Run the main file with go
+3. WebWeaver will automatically synchronize with your servers and start sending them requests
+4. Open your browser and visit localhost on the dashboard port you specified in the configuration to see your server's status.
 
 ## 🔭 Learn
 Golang: https://go.dev/doc/ <br>
