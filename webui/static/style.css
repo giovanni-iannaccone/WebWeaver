@@ -1,9 +1,23 @@
+:root {
+    --base-color: #f4f4f9;
+    --text-color: #333;
+    --nav-color:  #3b5998;
+    --btn-hover-color: #0071ff;
+}
+
+.dark-mode {
+    --base-color: #333;
+    --text-color: #f4f4f9;
+    --nav-color:  #0071ff;
+    --btn-hover-color: #3b5998;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: var(--base-color);
+    color: var(--text-color);
 }
 
 nav {
@@ -12,7 +26,7 @@ nav {
     justify-content: space-between;
     padding: 10px 20px;
 
-    background-color: #3b5998;
+    background-color: var(--nav-color);
     color: #fff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
@@ -28,18 +42,25 @@ nav a {
     color: #fff
 }
 
-nav svg {
-    width: 30px;
-    height: 30px;
-    fill: #fff;
+#theme-switch {
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
 }
 
-button {
+#theme-switch svg {
+    width: 30px;
+    height: 30px;
+    color: #fff;
+    fill: #fff
+}
+
+#hot-reload {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
-    background-color: #3b5998;
+    background-color: var(--nav-color);
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -50,12 +71,12 @@ button {
     margin: 20px;
 }
 
-button:hover {
-    background-color: #007bff;
+#hot-reload:hover {
+    background-color: var(--btn-hover-color);
     transform: translateY(-2px);
 }
 
-button svg {
+#hot-reload svg {
     width: 20px;
     height: 20px;
 }
@@ -68,13 +89,13 @@ button svg {
 }
 
 .server {
-    background-color: #fff;
+    background-color: var(--base-color);
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 10px;
     text-align: center;
     font-size: 1rem;
-    color: #555;
+    color: var(--text-color);
     font-weight: 400;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -118,30 +139,3 @@ footer {
     margin-bottom: 10px;
     position: absolute;
 }
-
-@media (max-width: 768px) {
-    nav h1 {
-        font-size: 1.5rem;
-    }
-
-    nav svg {
-        width: 25px;
-        height: 25px;
-    }
-
-    button {
-        font-size: 0.9rem;
-        padding: 8px 15px;
-    }
-
-    #server-holder {
-        padding: 10px;
-        gap: 15px;
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .server {
-        padding: 15px;
-    }
-}
-</style>
