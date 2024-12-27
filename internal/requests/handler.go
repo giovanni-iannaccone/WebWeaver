@@ -25,7 +25,7 @@ func getNextServer(ip string) {
 
 	lb, err := algorithmsData.NewLoadBalancer(config.Algorithm)
 	if err != nil {
-		utils.Print(data.Red, err.Error())
+		utils.Print(data.Red, "%s", err.Error())
 		return
 	}
 
@@ -40,14 +40,16 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 
 	mu.Lock()
 	getNextServer(ctx.RemoteIP().String())
-	mu.Unlock()
 
 	if internals.IsProhibited(config.Prohibited, ctx.Path()) {
 		ctx.Error("404 not found", fasthttp.StatusNotFound)
+		mu.Unlock()
 		return
 	}
 
 	ctx.Request.SetHost(config.Servers.Data[using].URL)
+	mu.Unlock()
+
 	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
 	if err != nil {
 		log.Print(err)
