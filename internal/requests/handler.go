@@ -1,7 +1,9 @@
 package requests
 
 import (
+	"crypto/tls"
 	"log"
+	"net"
 	"sync"
 	"time"
 	
@@ -11,6 +13,8 @@ import (
 	"internals/healthCheck"
 	"utils"
 
+	"golang.org/x/crypto/acme"
+	"golang.org/x/crypto/acme/autocert"
 	"github.com/valyala/fasthttp"
 )
 
@@ -34,7 +38,25 @@ func getNextServer(ip string) {
 	}
 }
 
-// handle request, send a well formed request to a server
+// obtains the configuration for the tls certificate
+func obtainCertificate(domain string, cache string) *tls.Config {
+	m := &autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(domain),
+		Cache:      autocert.DirCache(cache),
+	}
+
+	cfg := &tls.Config{
+		GetCertificate: m.GetCertificate,
+		NextProtos: []string{
+			"http/1.1", acme.ALPNProto,
+		},
+	}
+
+	return cfg
+}
+
+// handles request, sends a well formed request to a server
 func requestHandler(ctx *fasthttp.RequestCtx) {
 	var config = data.GetConfig()
 
@@ -50,7 +72,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	ctx.Request.SetHost(config.Servers.Data[using].URL)
 	mu.Unlock()
 
-	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second*10)
+	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second * 10)
 	if err != nil {
 		log.Print(err)
 	}
@@ -62,7 +84,35 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-// start the listener to receive requests
+// starts the listener on the port specified in host
+func serveWithHttp(host string) {
+	s := &fasthttp.Server{
+		Handler:     requestHandler,
+		ReadTimeout: time.Second * 2,
+	}
+
+	if err := s.ListenAndServe(host); err != nil {
+		log.Fatal(err)
+	}
+}
+
+// requests for a certificate and starts listener on 443 port
+func serveWithHttps(host string) {
+	var cfg *tls.Config = obtainCertificate(host, "./certs")
+
+	ln, err := net.Listen("tcp4", host + ":443")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var lnTls net.Listener = tls.NewListener(ln, cfg)
+
+	if err := fasthttp.Serve(lnTls, requestHandler); err != nil {
+		log.Fatal(err)
+	}
+}
+
+// starts the listener to receive requests
 func StartListener() {
 	var config = data.GetConfig()
 
@@ -70,12 +120,9 @@ func StartListener() {
 		go healthcheck.StartHealthCheckTimer(config.Servers, t, config.Dashboard < 0)
 	}
 
-	s := &fasthttp.Server{
-		Handler:     requestHandler,
-		ReadTimeout: time.Second * 2,
-	}
-
-	if err := s.ListenAndServe(config.Host); err != nil {
-		log.Fatal(err)
+	if len(config.Host) > 10 && config.Host[:10] == "localhost:" {
+		serveWithHttp(config.Host)
+	} else {
+		serveWithHttps(config.Host)
 	}
 }

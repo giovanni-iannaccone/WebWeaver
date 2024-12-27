@@ -27,7 +27,7 @@ func hotReload(config *data.Config) {
 }
 
 // renders the template with server data
-func idx(w http.ResponseWriter, r *http.Request, servers []server.ServerData) {
+func idx(w http.ResponseWriter, servers []server.ServerData) {
 	if err := tpl.ExecuteTemplate(w, "index.html", servers); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -40,14 +40,14 @@ func RenderUI() {
 	config.Servers.AddObserver(obs)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		idx(w, r, config.Servers.Data)
+		idx(w, config.Servers.Data)
 	})
 	http.HandleFunc("/hot-reload/", func(w http.ResponseWriter, r *http.Request) {
 		hotReload(config)
 	})
 	http.HandleFunc("/ws/", func(w http.ResponseWriter, r *http.Request) {
 		if err := sendData(w, r, config.Servers, obs); err != nil {
-			utils.Print(data.Red, err.Error())
+			utils.Print(data.Red, "%s", err.Error())
 		}
 	})
 	http.HandleFunc("/static/", staticFileHandler)

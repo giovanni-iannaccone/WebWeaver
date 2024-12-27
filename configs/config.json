@@ -4,7 +4,7 @@
         "                                                                          ",
         "   - algorithm:    rr for Round Robin, rnd for random choice              ",
         "                   iph for ip hash                                        ",
-        "   - host          the main server address                                ",
+        "   - host          localhost, an ip or your domain                        ",
         "   - dashboard     the port the dashboard html will run on                ",
         "   - servers:      write here your servers addresses and ports            ",
         "   - healthCheck:  seconds of the healthCheck timeout, put less           ",
@@ -24,7 +24,7 @@
     ],
     
     "healthCheck": 10,
-    "logs": "%USERPROFILE%\\Desktop\\logs.txt",
+    "logs": "./LB_LOG.txt",
 
     "prohibited": [
         "/.env",

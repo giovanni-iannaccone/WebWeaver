@@ -8,10 +8,11 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 
 - **Automatic Failover**: Manages automatic failover of unavailable backend servers.
 - **Dynamic Configuration**: Supports real-time configuration changes without needing a restart.
-- **Fast**: Thanks to the <a href="https://github.com/valyala/fasthttp">fasthttp</a> library, WebWeaver can quickly send packages across your network
+- **Fast**: Using the <a href="https://github.com/valyala/fasthttp">fasthttp</a> library, WebWeaver can quickly send packages across your network
 - **Load Balancing**: Distributes requests across backend servers using various strategies, including Round-Robin, Random and IP Hash.
 - **Monitoring and Logging**: Provides detailed statistics and request logging for in-depth monitoring.
 - **Security**: Includes configuration options for protection against common threats and connection management.
+- **SSL/TLS certificates**: With <a href="https://letsencrypt.org/">Let's encrypt</a> your domain will automatically have a free SSL/TLS certificate
 - **Web UI**: Thanks to WebSocket, we can easily render an auto-updating dashboard that provides real-time statistics about your servers
 
 ## 👨‍💻 Installation
@@ -62,7 +63,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
     ],
     
     "healthCheck": 10,
-    "logs": "%USERPROFILE%\\Desktop\\logs.txt",
+    "logs": "./LB_LOG.txt",
 
     "prohibited": [
         "/.env",
@@ -72,7 +73,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 ```
 
 - algorithm: rr for Round Robin, rnd for random choice, iph for ip hash
-- host: the main server address
+- host: localhost, an ip or your domain
 - dashboard: the port dashboard will run on  
 - servers: write here your servers addresses and ports
 - healthCheck:  seconds of the healthCheck timeout, put less than or 0 if you don't want the server to do any
@@ -90,6 +91,7 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 4. Open your browser and visit localhost on the dashboard port you specified in the configuration to see your server's status.
 
 ## 🔭 Learn
+Let's encrypt: https://letsencrypt.org/docs/ <br>
 Golang: https://go.dev/doc/ <br>
 Load Balancing: https://www.cloudflare.com/learning/performance/what-is-load-balancing/
 
