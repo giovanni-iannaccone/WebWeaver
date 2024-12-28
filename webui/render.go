@@ -53,7 +53,7 @@ func RenderUI() {
 	http.HandleFunc("/static/", staticFileHandler)
 
 	addr := fmt.Sprintf(":%d", config.Dashboard)
-	go http.ListenAndServe(addr, nil)
+	http.ListenAndServe(addr, nil)
 }
 
 // establishes a WebSocket connection and sends data to the client

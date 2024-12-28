@@ -130,7 +130,7 @@ func main() {
 	printConfigData()
 
 	if (config.Dashboard >= 0) {
-		webui.RenderUI()
+		go webui.RenderUI()
 		utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
 	}
 	
