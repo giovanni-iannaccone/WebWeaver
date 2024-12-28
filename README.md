@@ -24,27 +24,37 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 ### 🧪 Installation Steps
 1. **Clone the Repository**
 
-    ```sh
+    ```
     git clone https://github.com/giovanni-iannaccone/WebWeaver
+    ```
+    ```sh
     cd WebWeaver
     ```
 
 2. **Run the Project**
 
-    Ensure you have Go installed, then run:
+    - _Run without compiling_
 
-    ```sh
+    ```go
     go run ./cmd/main.go
     ```
 
-    or compile it with golang
-    ```sh
+    - _Compile with golang_
+    ```go
     go build ./cmd
     ```
 
-    or using makefile
-    ```sh
+    - _Compile using makefile_
+    ```
     make YOUR_OPERATING_SYSTEM
+    ```
+
+    - _Run in docker_
+    ```
+    docker build -t webweaver .
+    ```
+    ```
+    docker run -d -p 9000:9000 -p 9001:9001 --name webweaver webweaver
     ```
 
 ## ⚙ Configuration
