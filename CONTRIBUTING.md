@@ -17,6 +17,7 @@ Read <a href="/docs/">documentation</a> to know more about the actual implementa
 
 ## 🎨 Code style
 - **Naming**: use camelCase for function and variables names
+- **Clarity and Consistency**: keep variable and function names descriptive, avoid unnecessary abbreviations
 - **Types**: specify varibles types in declaration where it doesn't look redoundaunt
 - **Error Handling**: check all errors explicitly, avoid ignoring errors
 - **Formatting**: ensure your code is properly formatted using gofmt
@@ -27,5 +28,8 @@ Read <a href="/docs/">documentation</a> to know more about the actual implementa
     3. External libraries
 
 Ensure all your tests pass before submitting a PR, update documentation if your changes affect the program's behaviour
+
+These guidelines are designed to keep the codebase readable, maintainable, and consistent, even when multiple developers contribute. Following a common style helps reduce errors and makes the code easier to understand for others in the team.
+If you'd like to add more specific guidelines or have questions, feel free to ask!
 
 Thank you for contributing to WebWeaver! Your efforts are deeply appreciated. If you have any questions, feel free to reach out in the project discussions or open an issue.
