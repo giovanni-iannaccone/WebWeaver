@@ -67,6 +67,11 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
+	if using < 0 {
+		ctx.Error("500 internal server error", fasthttp.StatusInternalServerError)
+		return
+	}
+
 	ctx.Request.SetHost(config.Servers.Active[using])
 	mu.Unlock()
 
@@ -76,9 +81,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	}
 
 	if config.Logs != "" {
-		str := " " + ctx.RemoteIP().String() + " " + string(ctx.Method()) + " " + string(ctx.Path())
-		log.Print(str)
-		go utils.WriteLogs(str, config.Logs)
+		writeLogs(ctx, config.Logs)
 	}
 }
 
@@ -123,4 +126,11 @@ func StartListener() {
 	} else {
 		serveWithHttps(config.Host)
 	}
+}
+
+// prepares a well formed log message, print it and save it in logFile
+func writeLogs(ctx *fasthttp.RequestCtx, logFile string) {
+	str := " " + ctx.RemoteIP().String() + " " + string(ctx.Method()) + " " + string(ctx.Path())
+	log.Print(str)
+	go utils.WriteLogs(str, logFile)
 }
