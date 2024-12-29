@@ -46,7 +46,7 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 
     - _Compile using makefile_
     ```
-    make YOUR_OPERATING_SYSTEM
+    make WebWeaver
     ```
 
     - _Run in docker_
