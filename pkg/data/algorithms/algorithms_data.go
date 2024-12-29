@@ -3,12 +3,11 @@ package algorithmsData
 import (
 	"errors"
 	
-	"data/server"
 	algorithms "internals"
 )
 
 type LoadBalancer interface {
-	NextServer(servers *[]server.ServerData, ip string) int
+	NextServer(servers *[]string, ip string) int
 }
 
 // Load Balancing Algorithms

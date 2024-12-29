@@ -8,13 +8,17 @@ import (
 	"path/filepath"
 
 	"data"
-	"data/server"
 	"utils"
 
 	"github.com/gorilla/websocket"
 )
 
 var tpl *template.Template
+
+type PageData struct {
+	Active		*[]string
+	Inactive	*[]string
+} 
 
 // parses the HTML templates
 func Init() {
@@ -24,11 +28,12 @@ func Init() {
 // reads the configuration file and updates the configurations
 func hotReload(config *data.Config) {
 	*config = utils.ReadAndParseJson(config.Path)
+	config.Servers.NotifyObservers()
 }
 
 // renders the template with server data
-func idx(w http.ResponseWriter, servers []server.ServerData) {
-	if err := tpl.ExecuteTemplate(w, "index.html", servers); err != nil {
+func idx(w http.ResponseWriter, pd PageData) {
+	if err := tpl.ExecuteTemplate(w, "index.html", pd); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -39,17 +44,22 @@ func RenderUI() {
 	var config = data.GetConfig()
 	config.Servers.AddObserver(obs)
 
+	var pd = PageData{Active: &config.Servers.Active, Inactive: &config.Servers.Inactive}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		idx(w, config.Servers.Data)
+		idx(w, pd)
 	})
+
 	http.HandleFunc("/hot-reload/", func(w http.ResponseWriter, r *http.Request) {
 		hotReload(config)
 	})
+
 	http.HandleFunc("/ws/", func(w http.ResponseWriter, r *http.Request) {
-		if err := sendData(w, r, config.Servers, obs); err != nil {
+		if err := sendData(w, r, pd, obs); err != nil {
 			utils.Print(data.Red, "%s", err.Error())
 		}
 	})
+
 	http.HandleFunc("/static/", staticFileHandler)
 
 	addr := fmt.Sprintf(":%d", config.Dashboard)
@@ -57,7 +67,11 @@ func RenderUI() {
 }
 
 // establishes a WebSocket connection and sends data to the client
-func sendData(w http.ResponseWriter, r *http.Request, servers *server.Servers, obs chan bool) error {
+func sendData(w http.ResponseWriter, 
+	r *http.Request, 
+	pd PageData, 
+	obs chan bool) error {
+		
 	ws := data.GetWebSocket()
 
 	err := ws.UpgradeToWS(w, r)
@@ -68,7 +82,7 @@ func sendData(w http.ResponseWriter, r *http.Request, servers *server.Servers, o
 	defer ws.Conn.Close()
 
 	for range obs {
-		bytes, _ := json.Marshal(servers)
+		bytes, _ := json.Marshal(pd)
 
 		err := ws.Conn.WriteMessage(websocket.TextMessage, bytes)
 		if err != nil {

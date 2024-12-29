@@ -9,21 +9,49 @@ import (
 	"utils"
 )
 
-// checks if all servers are alive and notify observers
-func HealthCheck(servers *server.Servers) {
-	var updatedAnyServer bool = false
+const ACTIVE = true
+const INACTIVE = false
 
-	for i := range servers.Data {
-		previousState := servers.Data[i].IsAlive
-		currentState := isServerAlive(servers.Data[i].URL)
+func changeServersArray(servers *server.Servers,
+	updatedActive []int,
+	updatedInactive []int) {
 
-		if previousState != currentState {
-			servers.Data[i].IsAlive = currentState
-			updatedAnyServer = true
+		for i := range updatedActive {
+			servers.Inactive = append(servers.Inactive, servers.Active[i])
+			servers.Active = append(servers.Active[:i], servers.Active[i + 1:]...)
+		}
+
+		for i := range updatedInactive {
+			servers.Active = append(servers.Active, servers.Inactive[i])
+			servers.Inactive = append(servers.Inactive[:i], servers.Inactive[i + 1:]...)
+		}
+}
+
+// checks if a specific list of servers are still in their state
+func checkServers(servers []string, state bool) []int {
+	var updatedServers []int
+
+	for i := range servers {
+		currentState := isServerAlive(servers[i])
+
+		if currentState != state {
+			updatedServers = append(updatedServers, i)
 		}
 	}
 
-	if updatedAnyServer {
+	return updatedServers
+}
+
+// checks if all servers are alive and notify observers
+func HealthCheck(servers *server.Servers) {
+	var updatedActiveServers []int
+	var updatedInactiveServers []int
+
+	updatedActiveServers = checkServers(servers.Active, ACTIVE)
+	updatedInactiveServers = checkServers(servers.Inactive, INACTIVE)
+
+	if len(updatedActiveServers) > 0 || len(updatedInactiveServers) > 0 {
+		changeServersArray(servers, updatedActiveServers, updatedInactiveServers)
 		servers.NotifyObservers()
 	}
 }
@@ -34,21 +62,28 @@ func isServerAlive(url string) bool {
 
 	conn, err := net.DialTimeout("tcp", url, timeout)
 	if err != nil {
-		return false
+		return INACTIVE
 	}
 	defer conn.Close()
-	return true
+
+	return ACTIVE
 }
 
 // prints servers status
 func PrintHealthCheckStatus(servers *server.Servers) {
-	for  i := range servers.Data {
-		if servers.Data[i].IsAlive {
-			utils.Print(data.Green, "[+] %s\t\talive\n", servers.Data[i].URL)
-		} else {
-			utils.Print(data.Yellow, "[!] %s\t\tNOT alive\n", servers.Data[i].URL)
-		}
+	var currentTime time.Time = time.Now()
+    var formattedTime string = currentTime.Format(time.ANSIC)
+	utils.Print(data.Blue, "\n\nHealthcheck at %s\n", formattedTime)
+
+	for i := range servers.Inactive {
+		utils.Print(data.Yellow, "[!] %s\t\tNOT alive\n", servers.Inactive[i])
 	}
+
+	for i := range servers.Active {
+		utils.Print(data.Green, "[+] %s\t\t alive\n", servers.Active[i])
+	}
+
+	utils.Print(data.Reset, "\n\n")
 }
 
 // starts the health check timer, call the healthcheck function every time the timer expires
@@ -57,9 +92,9 @@ func StartHealthCheckTimer(servers *server.Servers, seconds int, printHealthChec
 	defer t.Stop()
 
 	for range t.C {
-        HealthCheck(servers)
-		// if printHealthCheckResult {
-        PrintHealthCheckStatus(servers)
-		// }
-    }
+		HealthCheck(servers)
+		if printHealthCheckResult {
+			PrintHealthCheckStatus(servers)
+		}
+	}
 }

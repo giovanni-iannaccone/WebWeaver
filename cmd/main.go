@@ -73,8 +73,8 @@ func printConfigData() {
 	utils.Print(data.Green, "[+] Dashboard: %d\n", config.Dashboard)
 
 	utils.Print(data.Green, "[+] Servers: \n")
-	for i := range config.Servers.Data {
-		utils.Print(data.Gray, "\t- %s\n", config.Servers.Data[i].URL)
+	for i := range config.Servers.Inactive {
+		utils.Print(data.Gray, "\t- %s\n", config.Servers.Inactive[i])
 	}
 
 	utils.Print(data.Green, "[+] HealthCheck: %d\n", config.HealthCheck)

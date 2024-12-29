@@ -33,9 +33,7 @@ func getNextServer(ip string) {
 		return
 	}
 
-	for !config.Servers.Data[using].IsAlive {
-		using = lb.NextServer(&config.Servers.Data, ip)
-	}
+	using = lb.NextServer(&config.Servers.Active, ip)
 }
 
 // obtains the configuration for the tls certificate
@@ -69,7 +67,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	ctx.Request.SetHost(config.Servers.Data[using].URL)
+	ctx.Request.SetHost(config.Servers.Active[using])
 	mu.Unlock()
 
 	err := fasthttp.DoTimeout(&ctx.Request, &ctx.Response, time.Second * 10)
@@ -117,7 +115,7 @@ func StartListener() {
 	var config = data.GetConfig()
 
 	if t := config.HealthCheck; t > 0 {
-		go healthcheck.StartHealthCheckTimer(config.Servers, t, config.Dashboard < 0)
+		go healthcheck.StartHealthCheckTimer(config.Servers, t, config.Dashboard <= 0)
 	}
 
 	if len(config.Host) > 10 && config.Host[:10] == "localhost:" {

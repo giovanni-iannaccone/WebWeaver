@@ -4,15 +4,11 @@ import "sync"
 
 // implementation of the observer pattern for the servers
 
-type ServerData struct {
-	URL     string
-	IsAlive bool
-}
-
 type Servers struct {
-	Data      []ServerData
-	observers []chan bool
-	mu        sync.Mutex
+	Active      []string
+	Inactive	[]string
+	observers 	[]chan bool
+	mu        	sync.Mutex
 }
 
 func (s *Servers) AddObserver(obs chan bool) {

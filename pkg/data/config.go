@@ -20,11 +20,12 @@ type ConfigRaw struct {
 // converts configurations from a raw format to the right format
 func (rawConfig ConfigRaw) Cast() Config {
 	var servers *server.Servers = GetConfig().Servers
-	servers.Data = []server.ServerData{}
+	servers.Active = []string{}
+	servers.Inactive = []string{}
 
 	for _, serverString := range rawConfig.Servers {
-		var serverData = server.ServerData{URL: serverString, IsAlive: false}
-		servers.Data = append(servers.Data, serverData)
+		var serverData = serverString
+		servers.Inactive = append(servers.Inactive, serverData)
 	}
 
 	return Config {
@@ -61,7 +62,8 @@ func GetConfig() *Config {
 
 		configInstance = &Config{
 			Servers: &server.Servers{
-				Data: []server.ServerData{},
+				Active: []string{},
+				Inactive: []string{},
 			},
 		}
 	})
@@ -84,7 +86,7 @@ func (config Config) CheckValidity() []string {
 		errors = append(errors, "[-] Set a valid host ")
 	}
 
-	if len(config.Servers.Data) == 0 {
+	if len(config.Servers.Inactive) == 0 {
 		errors = append(errors, "[-] No server found ")
 	}
 
