@@ -39,10 +39,6 @@ func mergeConfigs(cli *data.Config, file data.Config) {
 		cli.Dashboard = file.Dashboard
 	} 
 
-	if !cli.Sticky && file.Sticky != cli.Sticky {
-		cli.Sticky = file.Sticky
-	}
-
 	if cli.HealthCheck < 0 && file.HealthCheck != cli.HealthCheck {
 		cli.HealthCheck = file.HealthCheck
 	}
@@ -65,7 +61,6 @@ func parseFlags(path *string, config *data.Config) {
 	flag.IntVar(&config.Dashboard, "dashboard", -1, "Port where to start the dashboard")
 	flag.IntVar(&config.HealthCheck, "healthcheck", -1, "Healthcheck timer")
 
-	flag.BoolVar(&config.Sticky, "sticky", false, "Enable sticky session")
 	flag.BoolFunc("help", "Show help screen", printHelp)
 	flag.Parse()
 }
@@ -83,7 +78,6 @@ func printConfigData() {
 		utils.Print(data.Gray, "\t- %s\n", config.Servers.Inactive[i])
 	}
 
-	utils.Print(data.Green, "[+] Sticky: %t\n", config.Sticky)
 	utils.Print(data.Green, "[+] HealthCheck: %d\n", config.HealthCheck)
 	utils.Print(data.Green, "[+] Logs: %s\n", config.Logs)
 

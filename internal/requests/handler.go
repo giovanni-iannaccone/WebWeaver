@@ -1,9 +1,7 @@
 package requests
 
 import (
-	"crypto/rand"
 	"crypto/tls"
-	"encoding/base64"
 	"errors"
 	"log"
 	"net"
@@ -20,14 +18,10 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-const SESSION_ID_COOKIE = "sessionId"
-
 var (
 	currentServerIdx  int
 	mutex             sync.Mutex
 )
-
-var sessionMapping = make(map[string]string)
 
 // creates and returns a TLS configuration with a certificate manager
 func createTLSConfig(domain string, cacheDir string) *tls.Config {
@@ -40,71 +34,6 @@ func createTLSConfig(domain string, cacheDir string) *tls.Config {
 	return &tls.Config{
 		GetCertificate: manager.GetCertificate,
 		NextProtos:     []string{"http/1.1", acme.ALPNProto},
-	}
-}
-
-// generates a random session cookie value
-func generateSessionCookie() string {
-	const cookieLength = 32
-
-	var randomBytes = make([]byte, cookieLength)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		log.Fatal("Error generating random bytes: " + err.Error())
-	}
-
-	return base64.URLEncoding.EncodeToString(randomBytes)
-}
-
-// retrieves the server assigned to the current session
-func getStickySessionServer(ctx *fasthttp.RequestCtx) string {
-	var server, exists = sessionMapping[
-		string(ctx.Request.Header.Cookie(SESSION_ID_COOKIE)),
-	]
-
-	if exists {
-		return server
-	}
-
-	return ""
-}
-
-// redirects traffic based on previous associations or generates a cookie
-func handleStickySessions(ctx *fasthttp.RequestCtx) {
-	var config = data.GetConfig()
-
-	if internals.IsProhibited(config.Prohibited, ctx.Path()) {
-		ctx.Error("404 not found", fasthttp.StatusNotFound)
-		return
-	}
-
-	if server := getStickySessionServer(ctx); server != "" {
-		redirectToServer(ctx, server)
-
-	} else {
-		var cookie string = setSessionCookie(ctx)
-
-		mutex.Lock()
-		selectNextServer(ctx.RemoteIP().String())
-		mutex.Unlock()
-
-		if currentServerIdx < 0 {
-			ctx.Error("500 internal server error", fasthttp.StatusInternalServerError)
-		}
-
-		var server = config.Servers.Active[currentServerIdx]
-
-		sessionMapping[cookie] = server
-		redirectToServer(ctx, server)
-	}
-
-	var err = fasthttp.DoTimeout(&ctx.Request, &ctx.Response, 10*time.Second)
-	if err != nil {
-		logRequest(config.Logs, nil, err)
-	}
-
-	if config.Logs != "" {
-		logRequest(config.Logs, ctx, nil)
 	}
 }
 
@@ -149,7 +78,7 @@ func logRequest(logFile string, ctx *fasthttp.RequestCtx, err error) {
 // handles the redirection to the selected server
 func redirectToServer(ctx *fasthttp.RequestCtx, server string) {
 	ctx.Request.SetHost(server)
-}
+}	
 
 // redirects traffic using the configured algorithm
 func redirectBasedOnAlgorithm(ctx *fasthttp.RequestCtx) error {
@@ -174,21 +103,6 @@ func selectNextServer(clientIP string) {
 	}
 
 	currentServerIdx = loadBalancer.NextServer(&config.Servers.Active, clientIP)
-}
-
-// sets a session ID cookie for sticky sessions
-func setSessionCookie(ctx *fasthttp.RequestCtx) string {
-	var cookie = &fasthttp.Cookie{}
-	var cookieValue string = generateSessionCookie()
-
-	cookie.SetKey(SESSION_ID_COOKIE)
-	cookie.SetValue(cookieValue)
-	cookie.SetExpire(time.Now().Add(24 * time.Hour))
-	cookie.SetSameSite(fasthttp.CookieSameSiteLaxMode)
-
-	ctx.Response.Header.SetCookie(cookie)
-	
-	return cookieValue
 }
 
 // starts the HTTP server on the given host
@@ -223,15 +137,12 @@ func startHTTPSServer(host string, handler func(ctx *fasthttp.RequestCtx)) {
 func StartListener() {
 	var config = data.GetConfig()
 
-	var handler func(ctx *fasthttp.RequestCtx)
+	var handler func(ctx *fasthttp.RequestCtx) = handleRequest
 
-	if config.Sticky {
-		handler = handleStickySessions
-	} else {
-		handler = handleRequest
-	}
+	if  len(config.Host) > 10 && 
+		(config.Host[:10] == "localhost:" ||
+		config.Host[:10] == "127.0.0.1:") {
 
-	if len(config.Host) > 10 && config.Host[:10] == "localhost:" {
 		startHTTPServer(config.Host, handler)
 	} else {
 		startHTTPSServer(config.Host, handler)

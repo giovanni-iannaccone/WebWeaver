@@ -14,4 +14,5 @@ func WriteLogs(data string, filePath string) {
 	}
 
 	f.WriteString(data)
+	f.WriteString("\n")
 }

@@ -7,7 +7,6 @@
         "   - host          localhost, an ip or your domain                        ",
         "   - dashboard     the port the dashboard html will run on                ",
         "   - servers:      write here your servers addresses and ports            ",
-        "   - sticky:       enable sticky sessions                                 ",
         "   - healthCheck:  seconds of the healthCheck timeout, put less           ",
         "                   than or 0 if you don't want the server to do any       ",
         "   - logs:         file where to save logs, put nothing between           ",
@@ -23,7 +22,6 @@
         "localhost:80",
         "localhost:81"
     ],
-    "sticky": true,
     
     "healthCheck": 10,
     "logs": "./LB_LOG.txt",
