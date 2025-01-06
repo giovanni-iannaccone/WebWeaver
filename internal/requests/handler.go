@@ -71,19 +71,40 @@ func getStickySessionServer(ctx *fasthttp.RequestCtx) string {
 
 // redirects traffic based on previous associations or generates a cookie
 func handleStickySessions(ctx *fasthttp.RequestCtx) {
+	var config = data.GetConfig()
+
+	if internals.IsProhibited(config.Prohibited, ctx.Path()) {
+		ctx.Error("404 not found", fasthttp.StatusNotFound)
+		return
+	}
 
 	if server := getStickySessionServer(ctx); server != "" {
 		redirectToServer(ctx, server)
 
 	} else {
-		var activeServerList = data.GetConfig().Servers.Active
 		var cookie string = setSessionCookie(ctx)
 
+		mutex.Lock()
 		selectNextServer(ctx.RemoteIP().String())
-		var server = activeServerList[currentServerIdx]
+		mutex.Unlock()
+
+		if currentServerIdx < 0 {
+			ctx.Error("500 internal server error", fasthttp.StatusInternalServerError)
+		}
+
+		var server = config.Servers.Active[currentServerIdx]
 
 		sessionMapping[cookie] = server
 		redirectToServer(ctx, server)
+	}
+
+	var err = fasthttp.DoTimeout(&ctx.Request, &ctx.Response, 10*time.Second)
+	if err != nil {
+		logRequest(config.Logs, nil, err)
+	}
+
+	if config.Logs != "" {
+		logRequest(config.Logs, ctx, nil)
 	}
 }
 
@@ -97,13 +118,8 @@ func handleRequest(ctx *fasthttp.RequestCtx) {
 	}
 
 	mutex.Lock()
-	if config.Sticky {
-		handleStickySessions(ctx)
-
-	} else {
-		redirectBasedOnAlgorithm(ctx)
-		redirectToServer(ctx, config.Servers.Active[currentServerIdx])
-	}
+	redirectBasedOnAlgorithm(ctx)
+	redirectToServer(ctx, config.Servers.Active[currentServerIdx])
 	mutex.Unlock()
 
 	var err = fasthttp.DoTimeout(&ctx.Request, &ctx.Response, 10*time.Second)
@@ -176,9 +192,9 @@ func setSessionCookie(ctx *fasthttp.RequestCtx) string {
 }
 
 // starts the HTTP server on the given host
-func startHTTPServer(host string) {
+func startHTTPServer(host string, handler func(ctx *fasthttp.RequestCtx)) {
 	var server = &fasthttp.Server{
-		Handler:     handleRequest,
+		Handler:     handler,
 		ReadTimeout: 2 * time.Second,
 	}
 
@@ -188,7 +204,7 @@ func startHTTPServer(host string) {
 }
 
 // starts the HTTPS server on the given host
-func startHTTPSServer(host string) {
+func startHTTPSServer(host string, handler func(ctx *fasthttp.RequestCtx)) {
 	var	tlsConfig *tls.Config = createTLSConfig(host, "./certs")
 
 	var listener, err = net.Listen("tcp4", host + ":443")
@@ -198,7 +214,7 @@ func startHTTPSServer(host string) {
 
 	var tlsListener = tls.NewListener(listener, tlsConfig)
 
-	if err := fasthttp.Serve(tlsListener, handleRequest); err != nil {
+	if err := fasthttp.Serve(tlsListener, handler); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -207,9 +223,17 @@ func startHTTPSServer(host string) {
 func StartListener() {
 	var config = data.GetConfig()
 
-	if len(config.Host) > 10 && config.Host[:10] == "localhost:" {
-		startHTTPServer(config.Host)
+	var handler func(ctx *fasthttp.RequestCtx)
+
+	if config.Sticky {
+		handler = handleStickySessions
 	} else {
-		startHTTPSServer(config.Host)
+		handler = handleRequest
+	}
+
+	if len(config.Host) > 10 && config.Host[:10] == "localhost:" {
+		startHTTPServer(config.Host, handler)
+	} else {
+		startHTTPSServer(config.Host, handler)
 	}
 }
