@@ -12,19 +12,37 @@ import (
 const ACTIVE = true
 const INACTIVE = false
 
-func changeServersArray(servers *server.Servers,
-	updatedActive []int,
-	updatedInactive []int) {
+// if a server changes status, this function moves it to the right array
+func changeServersArray(servers *server.Servers, updatedActive []int, updatedInactive []int) {
+	for i := len(updatedActive) - 1; i >= 0; i-- {
+		idx := updatedActive[i]
+		if idx >= 0 && idx < len(servers.Active) {
+			serverToMove := servers.Active[idx]
+			servers.Active = append(servers.Active[:idx], servers.Active[idx+1:]...)
+			servers.Inactive = append(servers.Inactive, serverToMove)
 
-		for i := range updatedActive {
-			servers.Inactive = append(servers.Inactive, servers.Active[i])
-			servers.Active = append(servers.Active[:i], servers.Active[i + 1:]...)
+			for j := i + 1; j < len(updatedActive); j++ {
+				if updatedActive[j] > idx {
+					updatedActive[j]--
+				}
+			}
 		}
+	}
 
-		for i := range updatedInactive {
-			servers.Active = append(servers.Active, servers.Inactive[i])
-			servers.Inactive = append(servers.Inactive[:i], servers.Inactive[i + 1:]...)
+	for i := len(updatedInactive) - 1; i >= 0; i-- {
+		idx := updatedInactive[i]
+		if idx >= 0 && idx < len(servers.Inactive) {
+			serverToMove := servers.Inactive[idx]
+			servers.Inactive = append(servers.Inactive[:idx], servers.Inactive[idx+1:]...)
+			servers.Active = append(servers.Active, serverToMove)
+
+			for j := i + 1; j < len(updatedInactive); j++ {
+				if updatedInactive[j] > idx {
+					updatedInactive[j]--
+				}
+			}
 		}
+	}
 }
 
 // checks if a specific list of servers are still in their state

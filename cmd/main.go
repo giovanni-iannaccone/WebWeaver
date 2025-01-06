@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"data"
+	"internals/healthCheck"
 	"internals/requests"
 	"utils"
 	"webui"
@@ -38,6 +39,10 @@ func mergeConfigs(cli *data.Config, file data.Config) {
 		cli.Dashboard = file.Dashboard
 	} 
 
+	if !cli.Sticky && file.Sticky != cli.Sticky {
+		cli.Sticky = file.Sticky
+	}
+
 	if cli.HealthCheck < 0 && file.HealthCheck != cli.HealthCheck {
 		cli.HealthCheck = file.HealthCheck
 	}
@@ -60,6 +65,7 @@ func parseFlags(path *string, config *data.Config) {
 	flag.IntVar(&config.Dashboard, "dashboard", -1, "Port where to start the dashboard")
 	flag.IntVar(&config.HealthCheck, "healthcheck", -1, "Healthcheck timer")
 
+	flag.BoolVar(&config.Sticky, "sticky", false, "Enable sticky session")
 	flag.BoolFunc("help", "Show help screen", printHelp)
 	flag.Parse()
 }
@@ -77,6 +83,7 @@ func printConfigData() {
 		utils.Print(data.Gray, "\t- %s\n", config.Servers.Inactive[i])
 	}
 
+	utils.Print(data.Green, "[+] Sticky: %t\n", config.Sticky)
 	utils.Print(data.Green, "[+] HealthCheck: %d\n", config.HealthCheck)
 	utils.Print(data.Green, "[+] Logs: %s\n", config.Logs)
 
@@ -99,6 +106,23 @@ func printHelp(_ string) error {
 	
 	os.Exit(0)
 	return nil
+}
+
+// starts web ui and health check
+func startNetworkStuff(config data.Config) {
+	healthcheck.HealthCheck(config.Servers)
+	
+	if config.Dashboard >= 0 {
+		go webui.RenderUI()
+	}
+
+	if config.HealthCheck >= 0 {
+		go healthcheck.StartHealthCheckTimer(
+			config.Servers, 
+			config.HealthCheck, 
+			config.Dashboard < 0,
+		)
+	}
 }
 
 // init gets executed before the main
@@ -128,12 +152,12 @@ func main() {
 	}
 
 	printConfigData()
-
+	
+	startNetworkStuff(*config)
 	if (config.Dashboard >= 0) {
-		go webui.RenderUI()
 		utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
 	}
-	
+
 	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
 	requests.StartListener()
 }

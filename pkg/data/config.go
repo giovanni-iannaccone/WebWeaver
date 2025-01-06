@@ -8,13 +8,14 @@ import (
 
 // structure to hold json data
 type ConfigRaw struct {
-	Algorithm   string   `json:"algorithm"`
-	Host        string   `json:"host"`
-	Dashboard   int      `json:"dashboard"`
-	Servers     []string `json:"servers"`
-	HealthCheck int      `json:"healthCheck"`
-	Logs        string   `json:"logs"`
-	Prohibited  []string `json:"prohibited"`
+	Algorithm   string   	`json:"algorithm"`
+	Host        string   	`json:"host"`
+	Dashboard   int      	`json:"dashboard"`
+	Servers     []string 	`json:"servers"`
+	Sticky		bool		`json:"sticky"`
+	HealthCheck int      	`json:"healthCheck"`
+	Logs        string   	`json:"logs"`
+	Prohibited	[]string 	`json:"prohibited"`
 }
 
 // converts configurations from a raw format to the right format
@@ -33,6 +34,7 @@ func (rawConfig ConfigRaw) Cast() Config {
 		Host:        rawConfig.Host,
 		Dashboard:   rawConfig.Dashboard,
 		Servers:     servers,
+		Sticky:      rawConfig.Sticky,
 		HealthCheck: rawConfig.HealthCheck,
 		Logs:        rawConfig.Logs,
 		Prohibited:  rawConfig.Prohibited,
@@ -47,6 +49,7 @@ type Config struct {
 	Host        string
 	Dashboard   int
 	Servers     *server.Servers
+	Sticky		bool
 	HealthCheck int
 	Logs        string
 	Prohibited  []string
