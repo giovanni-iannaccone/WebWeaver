@@ -8,6 +8,13 @@ function enableDarkMode() {
     localStorage.setItem("darkMode", "active");
 }
 
+function showBasedOnTheme() {
+    let dark = localStorage.getItem("darkMode");
+    dark == "active"
+        ? enableDarkMode()
+        : disableDarkMode();
+}
+
 function themeSwitch() {
     let dark = localStorage.getItem("darkMode");
     dark == "active"
@@ -55,4 +62,4 @@ socket.onmessage = function (e) {
     serverHolder.innerHTML = html;
 };
 
-themeSwitch();
+showBasedOnTheme();
