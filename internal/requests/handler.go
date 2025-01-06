@@ -2,7 +2,6 @@ package requests
 
 import (
 	"crypto/tls"
-	"errors"
 	"log"
 	"net"
 	"sync"
@@ -47,8 +46,16 @@ func handleRequest(ctx *fasthttp.RequestCtx) {
 	}
 
 	mutex.Lock()
-	redirectBasedOnAlgorithm(ctx)
-	redirectToServer(ctx, config.Servers.Active[currentServerIdx])
+	selectNextServer(ctx.RemoteIP().String())
+
+	if currentServerIdx < 0 {
+		ctx.Error("500 internal server error", fasthttp.StatusInternalServerError)
+		mutex.Unlock()
+		return 
+	} else {
+		redirectToServer(ctx, config.Servers.Active[currentServerIdx])			
+	}
+
 	mutex.Unlock()
 
 	var err = fasthttp.DoTimeout(&ctx.Request, &ctx.Response, 10*time.Second)
@@ -78,18 +85,6 @@ func logRequest(logFile string, ctx *fasthttp.RequestCtx, err error) {
 // handles the redirection to the selected server
 func redirectToServer(ctx *fasthttp.RequestCtx, server string) {
 	ctx.Request.SetHost(server)
-}	
-
-// redirects traffic using the configured algorithm
-func redirectBasedOnAlgorithm(ctx *fasthttp.RequestCtx) error {
-	selectNextServer(ctx.RemoteIP().String())
-
-	if currentServerIdx < 0 {
-		ctx.Error("500 internal server error", fasthttp.StatusInternalServerError)
-		return errors.New("no server alive")
-	}
-
-	return nil
 }
 
 // retrieves the next server based on the load balancing algorithm
