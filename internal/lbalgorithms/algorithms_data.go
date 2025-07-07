@@ -1,9 +1,7 @@
-package algorithmsData
+package lbalgorithms
 
 import (
 	"errors"
-	
-	algorithms "internals"
 )
 
 type LoadBalancer interface {
@@ -14,11 +12,11 @@ type LoadBalancer interface {
 func NewLoadBalancer(algorithm string) (LoadBalancer, error) {
 	switch algorithm {
 	case "iph":
-		return algorithms.IpHashAlgorithm{}, nil
+		return IpHashAlgorithm{}, nil
 	case "rnd":
-		return algorithms.RandomAlgorithm{}, nil
+		return RandomAlgorithm{}, nil
 	case "rr":
-		return &algorithms.RoundRobinAlgorithm{}, nil
+		return &RoundRobinAlgorithm{}, nil
 	default:
 		return nil, errors.New("nknown algorithm")
 	}

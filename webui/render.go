@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"data"
-	"utils"
+	"config"
+	"console"
+	"jsonutils"
+	"websocket"
 
-	"github.com/gorilla/websocket"
+	gws "github.com/gorilla/websocket"
 )
 
 var tpl *template.Template
@@ -26,8 +28,8 @@ func Init() {
 }
 
 // reads the configuration file and updates the configurations
-func hotReload(config *data.Config) {
-	*config = utils.ReadAndParseJson(config.Path)
+func hotReload(config *config.Config) {
+	*config = jsonutils.ReadAndParseJson(config.Path)
 	config.Servers.NotifyObservers()
 }
 
@@ -41,7 +43,7 @@ func idx(w http.ResponseWriter, pd PageData) {
 // starts the HTTP server and handles routing
 func RenderUI() {
 	var obs = make(chan bool)
-	var config = data.GetConfig()
+	var config = config.GetConfig()
 	config.Servers.AddObserver(obs)
 
 	var pd = PageData{Active: &config.Servers.Active, Inactive: &config.Servers.Inactive}
@@ -56,7 +58,7 @@ func RenderUI() {
 
 	http.HandleFunc("/ws/", func(w http.ResponseWriter, r *http.Request) {
 		if err := sendData(w, r, pd, obs); err != nil {
-			utils.Print(data.Red, "%s", err.Error())
+			console.Print(console.Red, "%s", err.Error())
 		}
 	})
 
@@ -72,7 +74,7 @@ func sendData(w http.ResponseWriter,
 	pd PageData, 
 	obs chan bool) error {
 		
-	ws := data.GetWebSocket()
+	ws := websocket.GetWebSocket()
 
 	err := ws.UpgradeToWS(w, r)
 	if err != nil {
@@ -84,7 +86,7 @@ func sendData(w http.ResponseWriter,
 	for range obs {
 		bytes, _ := json.Marshal(pd)
 
-		err := ws.Conn.WriteMessage(websocket.TextMessage, bytes)
+		err := ws.Conn.WriteMessage(gws.TextMessage, bytes)
 		if err != nil {
 			return err
 		}

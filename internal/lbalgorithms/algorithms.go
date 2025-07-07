@@ -1,4 +1,4 @@
-package internals
+package lbalgorithms
 
 import (
 	"crypto/md5"

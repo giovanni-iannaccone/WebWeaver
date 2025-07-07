@@ -1,4 +1,4 @@
-package internals
+package security
 
 func IsProhibited(prohibitedList []string, directory []byte) bool {
 	for _, dir := range prohibitedList {

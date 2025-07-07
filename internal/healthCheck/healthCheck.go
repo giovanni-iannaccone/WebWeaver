@@ -4,9 +4,8 @@ import (
 	"net"
 	"time"
 
-	"data"
-	"data/server"
-	"utils"
+	"console"
+	"server"
 )
 
 const ACTIVE = true
@@ -91,17 +90,17 @@ func isServerAlive(url string) bool {
 func PrintHealthCheckStatus(servers *server.Servers) {
 	var currentTime time.Time = time.Now()
     var formattedTime string = currentTime.Format(time.ANSIC)
-	utils.Print(data.Blue, "\n\nHealthcheck at %s\n", formattedTime)
+	console.Print(console.Blue, "\n\nHealthcheck at %s\n", formattedTime)
 
 	for i := range servers.Inactive {
-		utils.Print(data.Yellow, "[!] %s\t\tNOT alive\n", servers.Inactive[i])
+		console.Print(console.Yellow, "[!] %s\t\tNOT alive\n", servers.Inactive[i])
 	}
 
 	for i := range servers.Active {
-		utils.Print(data.Green, "[+] %s\t\t alive\n", servers.Active[i])
+		console.Print(console.Green, "[+] %s\t\t alive\n", servers.Active[i])
 	}
 
-	utils.Print(data.Reset, "\n\n")
+	console.Print(console.Reset, "\n\n")
 }
 
 // starts the health check timer, call the healthcheck function every time the timer expires

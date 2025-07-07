@@ -1,21 +1,22 @@
-package utils
+package jsonutils
 
 import (
 	"encoding/json"
 	"io"
 	"os"
 
-	"data"
+	"console"
+	"config"
 )
 
 // reads the json and conver it to a better structure
-func ReadAndParseJson(path string) data.Config {
-	var rawConfig data.ConfigRaw
-	var config data.Config
+func ReadAndParseJson(path string) config.Config {
+	var rawConfig config.ConfigRaw
+	var config config.Config
 
 	err := ReadJson(&rawConfig, path)
 	if err != nil {
-		Print(data.Red, "%s %s", err.Error(), path)
+		console.Println(console.Red, "%s %s", err.Error(), path)
 	}
 
 	config = rawConfig.Cast()

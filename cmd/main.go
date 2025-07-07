@@ -4,19 +4,20 @@ import (
 	"flag"
 	"os"
 
-	"data"
-	"internals/healthCheck"
-	"internals/requests"
-	"utils"
+	"config"
+	"console"
+	"healthCheck"
+	"jsonutils"
+	"requests"
 	"webui"
 )
 
 // calls the function to check errors, if any, print them
-func checkAndPrintErrors(config data.Config) bool {
+func checkAndPrintErrors(config config.Config) bool {
 	errors := config.CheckValidity()
 	if errors != nil {
 		for _, err := range errors {
-			utils.Print(data.Red, "%s\n", err)
+			console.Print(console.Red, "%s\n", err)
 		}
 
 		return true
@@ -26,7 +27,7 @@ func checkAndPrintErrors(config data.Config) bool {
 }
 
 // merges the configurations from the file and those from cli
-func mergeConfigs(cli *data.Config, file data.Config) {
+func mergeConfigs(cli *config.Config, file config.Config) {
 	if cli.Algorithm == "" && file.Algorithm != cli.Algorithm {
 		cli.Algorithm = file.Algorithm
 	}
@@ -52,7 +53,7 @@ func mergeConfigs(cli *data.Config, file data.Config) {
 }
 
 // parses flags using the flag package
-func parseFlags(path *string, config *data.Config) {
+func parseFlags(path *string, config *config.Config) {
 	flag.StringVar(path, "config", "./configs/config.json", "Config file path")
 	flag.StringVar(&config.Algorithm, "algorithm", "", "Algorithm we will use to send packages")
 	flag.StringVar(&config.Host, "host", "", "Address load balancer will listen on")
@@ -67,23 +68,23 @@ func parseFlags(path *string, config *data.Config) {
 
 // prints configurations
 func printConfigData() {
-	var config data.Config = *data.GetConfig()
+	var config config.Config = *config.GetConfig()
 	
-	utils.Print(data.Green, "[+] Using algorithm %s\n", config.Algorithm)
-	utils.Print(data.Green, "[+] Host: %s\n", config.Host)
-	utils.Print(data.Green, "[+] Dashboard: %d\n", config.Dashboard)
+	console.Println(console.Green, "[+] Using algorithm %s", config.Algorithm)
+	console.Println(console.Green, "[+] Host: %s", config.Host)
+	console.Println(console.Green, "[+] Dashboard: %d", config.Dashboard)
 
-	utils.Print(data.Green, "[+] Servers: \n")
+	console.Print(console.Green, "[+] Servers: \n")
 	for i := range config.Servers.Inactive {
-		utils.Print(data.Gray, "\t- %s\n", config.Servers.Inactive[i])
+		console.Print(console.Gray, "\t- %s\n", config.Servers.Inactive[i])
 	}
 
-	utils.Print(data.Green, "[+] HealthCheck: %d\n", config.HealthCheck)
-	utils.Print(data.Green, "[+] Logs: %s\n", config.Logs)
+	console.Print(console.Green, "[+] HealthCheck: %d\n", config.HealthCheck)
+	console.Print(console.Green, "[+] Logs: %s\n", config.Logs)
 
-	utils.Print(data.Green, "[+] Prohibited: \n")
+	console.Print(console.Green, "[+] Prohibited: \n")
 	for _, dir := range config.Prohibited {
-		utils.Print(data.Gray, "\t- %s\n", dir)
+		console.Print(console.Gray, "\t- %s\n", dir)
 	}
 }
 
@@ -91,19 +92,19 @@ func printConfigData() {
 func printHelp(_ string) error {
 	var binaryName string = os.Args[0]
 
-	utils.Print(data.Reset, "%s\t\t--help\t\tShow this screen\n", binaryName)
-	utils.Print(data.Reset, "%s\t\t--config\tSpecify a configuration file\n", binaryName)
-	utils.Print(data.Reset, "( if the configuration isn't specified, the file will be ./configs/config.json )\n\n")
-	utils.Print(data.Reset, "Example: %s -c config.json\n\n", binaryName)
-	utils.Print(data.Reset, "Use a different value from the one in configurations by passing it as an arg\n")
-	utils.Print(data.Reset, "Example: %s --logs logs.txt", binaryName)
+	console.Print(console.Reset, "%s\t\t--help\t\tShow this screen\n", binaryName)
+	console.Print(console.Reset, "%s\t\t--config\tSpecify a configuration file\n", binaryName)
+	console.Print(console.Reset, "( if the configuration isn't specified, the file will be ./configs/config.json )\n\n")
+	console.Print(console.Reset, "Example: %s -c config.json\n\n", binaryName)
+	console.Print(console.Reset, "Use a different value from the one in configurations by passing it as an arg\n")
+	console.Print(console.Reset, "Example: %s --logs logs.txt", binaryName)
 	
 	os.Exit(0)
 	return nil
 }
 
 // starts web ui and health check
-func startNetworkStuff(config data.Config) {
+func startNetworkStuff(config config.Config) {
 	healthcheck.HealthCheck(config.Servers)
 	
 	if config.Dashboard >= 0 {
@@ -128,15 +129,15 @@ func init() {
 func main() {
 	var configFilePath string
 
-	var fileConfig data.Config
-	var config *data.Config = data.GetConfig()
+	var fileConfig config.Config
+	var config *config.Config = config.GetConfig()
 
 	parseFlags(&configFilePath, config)
 
-	utils.Print(data.Green, "===== Starting WebWeaver =====\n")
-	utils.Print(data.Green, "[+] Reading config files\n")
+	console.Println(console.Green, "===== Starting WebWeaver =====")
+	console.Println(console.Reset, "Reading config files...")
 
-	fileConfig = utils.ReadAndParseJson(configFilePath)
+	fileConfig = jsonutils.ReadAndParseJson(configFilePath)
 
 	mergeConfigs(config, fileConfig)
 	config.Path = configFilePath
@@ -149,9 +150,9 @@ func main() {
 	
 	startNetworkStuff(*config)
 	if (config.Dashboard >= 0) {
-		utils.Print(data.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
+		console.Println(console.Blue, "Online, go to localhost:%d to access dashboard", config.Dashboard)
 	}
 
-	utils.Print(data.Gray, "\nPress CTRL^C to stop\n")
+	console.Print(console.Gray, "\nPress CTRL^C to stop\n")
 	requests.StartListener()
 }

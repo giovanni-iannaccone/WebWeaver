@@ -1,9 +1,9 @@
-package data
+package config
 
 import (
 	"sync"
 
-	"data/server"
+	"server"
 )
 
 // structure to hold json data
