@@ -1,5 +1,13 @@
 <img src="assets/logo.png" alt="logo" title="WebWeaver"></img>
 
+![License](https://img.shields.io/github/license/giovanni-iannaccone/WebWeaver)
+[![Number of GitHub issues that are open](https://img.shields.io/github/issues/giovanni-iannaccone/WebWeaver)](https://github.com/giovanni-iannaccone/WebWeaver/issues)
+![Number of GitHub closed issues](https://img.shields.io/github/issues-closed/giovanni-iannaccone/WebWeaver)
+![Number of GitHub pull requests that are open](https://img.shields.io/github/issues-pr-raw/giovanni-iannaccone/WebWeaver)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/giovanni-iannaccone/WebWeaver)
+![Number of GitHub contributors](https://img.shields.io/github/contributors/giovanni-iannaccone/WebWeaver)
+[![Number of GitHub stars](https://img.shields.io/github/stars/giovanni-iannaccone/WebWeaver)](https://github.com/giovanni-iannaccone/WebWeaver/stargazers)
+
 # 🕸 WebWeaver
 
 WebWeaver is a load balancer written in Go, designed to handle load balancing efficiently and at scale. With a modular architecture and simple configuration, WebWeaver is ideal for modern deployments and high-availability environments.
@@ -107,7 +115,9 @@ Golang: https://go.dev/doc/ <br>
 Load Balancing: https://www.cloudflare.com/learning/performance/what-is-load-balancing/
 
 ## 🧩 Contributing
-We welcome contributing. See CONTRIBUTING.md file for details
+We welcome contributing. See CONTRIBUTING.md file for details.
+
+Please note that this project is released with a <a href="CODE_OF_CONDUCT.md">Contributor Code of Conduct</a>. By participating in this project, you agree to abide by its terms.
 
 ## ⚖ License
 This project is licensed under the GPL-3.0 License. See the LICENSE file for details.
