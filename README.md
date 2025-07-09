@@ -42,23 +42,26 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
 
 2. **Run the Project**
 
-    - _Run without compiling_
+    - Run without compiling
 
     ```go
     go run ./cmd/main.go
     ```
 
-    - _Compile with golang_
+    - Compile with golang
+    
     ```go
     go build ./cmd
     ```
 
-    - _Compile using makefile_
+    - Compile using makefile
+
     ```
     make WebWeaver
     ```
 
-    - _Run in docker_
+    - Run in docker
+
     ```
     docker build -t webweaver .
     ```
@@ -91,13 +94,13 @@ WebWeaver configuration is managed through a JSON file. Here's an example config
 }
 ```
 
-- algorithm: rr for Round Robin, rnd for random choice, iph for ip hash
-- host: localhost, an ip or your domain
-- dashboard: the port dashboard will run on  
-- servers: write here your servers addresses and ports
-- healthCheck:  seconds of the healthCheck timeout, put less than or 0 if you don't want the server to do any
-- logs: file where to save logs, put nothing between quotes if you don't want to save logs 
-- prohibited: file you don't want the server to show
+- **algorithm**: rr for Round Robin, rnd for random choice, iph for ip hash
+- **host**: localhost, an ip or your domain
+- **dashboard**: the port dashboard will run on  
+- **servers**: write here your servers addresses and ports
+- **healthCheck**:  seconds of the healthCheck timeout, put less than or 0 if you don't want the server to do any
+- **logs**: file where to save logs, put nothing between quotes if you don't want to save logs 
+- **prohibited**: file you don't want the server to show
 
 
 ## 🎮 Usage
@@ -121,7 +124,6 @@ Please note that this project is released with a <a href="CODE_OF_CONDUCT.md">Co
 
 ## ⚖️ License
 This project is licensed under the GPL-3.0 License. See the LICENSE file for details.
-
 
 ## ⚔️ Contact
 - For any inquiries or support, please contact <a href="mailto:iannacconegiovanni444@gmail.com"> iannacconegiovanni444@gmail.com </a>.
