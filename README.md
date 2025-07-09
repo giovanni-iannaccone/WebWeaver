@@ -66,7 +66,7 @@ WebWeaver is a load balancer written in Go, designed to handle load balancing ef
     docker run -d -p 9000:9000 -p 9001:9001 --name webweaver webweaver
     ```
 
-## ⚙ Configuration
+## ⚙️ Configuration
 
 WebWeaver configuration is managed through a JSON file. Here's an example configuration:
 
@@ -119,11 +119,11 @@ We welcome contributing. See CONTRIBUTING.md file for details.
 
 Please note that this project is released with a <a href="CODE_OF_CONDUCT.md">Contributor Code of Conduct</a>. By participating in this project, you agree to abide by its terms.
 
-## ⚖ License
+## ⚖️ License
 This project is licensed under the GPL-3.0 License. See the LICENSE file for details.
 
 
-## ⚔ Contact
+## ⚔️ Contact
 - For any inquiries or support, please contact <a href="mailto:iannacconegiovanni444@gmail.com"> iannacconegiovanni444@gmail.com </a>.
 - Visit my site for more informations about me and my work <a href="https://giovanni-iannaccone.gith
 ub.io" target=”_blank” rel="noopener noreferrer"> https://giovanni-iannaccone.github.io </a>
